@@ -1,8 +1,8 @@
 {
-  "name": "logical-operation-test",
+  "name": "logical-operators-test",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://logical-operation-test.netlify.app",
+  "homepage": "https://logical-operators-test.netlify.app",
   "dependencies": {
     "@supabase/supabase-js": "^1.33.3",
     "idb": "^6.1.3",
