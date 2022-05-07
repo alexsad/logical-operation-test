@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { IWire } from '../../interfaces/interfaces';
+import useChipLayer from '../stores/useChipLayer';
 
 const LineToWrap = styled.div`
     width: 1px;
@@ -9,15 +11,12 @@ const LineToWrap = styled.div`
     z-index:0;
 `;
 
-const LineTo: React.FC<{
-    chipInputId: string,
-    chipOutputId: string,
-}> = ({chipInputId, chipOutputId}) => {
+const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id}) => {
     const elRef = useRef<HTMLDivElement>(null);
     const getOffset = ( el: HTMLElement ) => {
         var rect = el.getBoundingClientRect();
         return {
-            left: rect.left + window.pageXOffset-279,
+            left: rect.left + window.pageXOffset-345,
             top: rect.top + window.pageYOffset,
             width: rect.width || el.offsetWidth,
             height: rect.height || el.offsetHeight
@@ -29,11 +28,11 @@ const LineTo: React.FC<{
         var off1 = getOffset(fromElem);
         var off2 = getOffset(toElem);
         // bottom right
-        var x1 = off1.left + off1.width;
-        var y1 = off1.top + off1.height - 5;
+        var x1 = off1.left + (off1.width / 2);
+        var y1 = off1.top + (off1.height / 2);
         // top right
-        var x2 = off2.left + off2.width;
-        var y2 = off2.top + 5;
+        var x2 = off2.left + (off2.width / 2);
+        var y2 = off2.top + (off2.height / 2);
         // distance
         var length = Math.sqrt(((x2-x1) * (x2-x1)) + ((y2-y1) * (y2-y1)));
         // center
@@ -49,7 +48,7 @@ const LineTo: React.FC<{
         line.style.left   = `${cx}px`;        
     }, []);
 
-    useEffect(() => {
+    const organizeLine = useCallback(() => {
         const line = elRef.current;
         const fromElem = document.getElementById(chipOutputId);
         const toElem =  document.getElementById(chipInputId);
@@ -63,26 +62,21 @@ const LineTo: React.FC<{
     }, [chipInputId, chipOutputId, adjustLine]);
 
     useEffect(() => {
-    const organizeLine = () => {
-        const line = elRef.current;
-        const fromElem = document.getElementById(chipOutputId);
-        const toElem =  document.getElementById(chipInputId);
-        if(!!line && !!fromElem && !!toElem){
-            adjustLine(
-                fromElem, 
-                toElem,
-                line
-            );
-        }
-    }
+        organizeLine();
+    }, [organizeLine]);
 
-    globalThis.addEventListener('chip:move', organizeLine);
+    useEffect(() => {
+        globalThis.addEventListener('chip:move', organizeLine);
     return () => {
         globalThis.removeEventListener('chip:move', organizeLine);
     }
-    }, [chipInputId, chipOutputId, adjustLine]);
+    }, [organizeLine]);
 
-    return (<LineToWrap ref={elRef}/>);
+    const onRemoveWire = () => {
+        useChipLayer.getState().removeWire(id)
+    }
+
+    return (<LineToWrap onDoubleClick={onRemoveWire} ref={elRef}/>);
 }
 
 

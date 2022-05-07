@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import useChipLayers from '../stores/useChipLayers';
+import TrashElement from '../float-remove-btn/FloatRemoveBtn';
+import useChipLayer from '../stores/useChipLayer';
 
 const InputOutputPoint = styled.div`
     width: 50px;
@@ -8,6 +9,8 @@ const InputOutputPoint = styled.div`
     background-color: gray;
     border-radius: 50%;
     border: 1px solid transparent;
+    z-index: 1;
+    position: relative;
 `
 const InputPointAddBox = styled(InputOutputPoint)`
     background-color: #518a8a;
@@ -18,15 +21,20 @@ const InputPointAddBox = styled(InputOutputPoint)`
 `
 
 const InputOutputPointActive = styled(InputOutputPoint)`
-    background-color: red;
+    background-color: #a00;
 `
 
 const InputPointAdd: React.FC = () => {
     const addPoint = () => {
-        useChipLayers.getState().addInpuPoint({
+        useChipLayer.getState().addInpuPoint({
             id: '',
             active: false,
         });
+        setTimeout(() => {
+            globalThis.dispatchEvent(
+                new CustomEvent('chip:move', {})
+            );
+        }, 10);
     }
     return (
         <InputPointAddBox onClick={addPoint}>+</InputPointAddBox>
@@ -35,10 +43,15 @@ const InputPointAdd: React.FC = () => {
 
 const OutputPointAdd: React.FC = () => {
     const addPoint = () => {
-        useChipLayers.getState().addOutPoint({
+        useChipLayer.getState().addOutPoint({
             id: '',
             active: false,
         });
+        setTimeout(() => {
+            globalThis.dispatchEvent(
+                new CustomEvent('chip:move', {})
+            );
+        }, 10);
     }
     return (
         <InputPointAddBox onClick={addPoint}>+</InputPointAddBox>
@@ -46,36 +59,67 @@ const OutputPointAdd: React.FC = () => {
 }
 
 const InputPoint: React.FC<{inputPointId: string, active: boolean}> = ({inputPointId, active}) => {
-    const {selectedOutputId, setSelectedOutputId, activeInputSource} = useChipLayers();
-    const borderColor =  selectedOutputId === inputPointId ? 'yellow' : 'transparent';
+    const [isMouseOver, setIsMouseOver] = useState(false);  
+    const selectedOutputId = useChipLayer(state => state.selectedOutputId);
+    const borderColor =  selectedOutputId ===  inputPointId ? 'yellow' : 'transparent';
+
     const onSetInputPoint = () => {
-        setSelectedOutputId(inputPointId);
+        useChipLayer.getState().setSelectedOutputId(inputPointId);
     }
     const setActiveInactive = () => {
-        activeInputSource(inputPointId, !active);
+        useChipLayer.getState().activateInputSource(inputPointId, !active);
+    }
+    const onRemovePoint = () => {
+        useChipLayer.getState().removeInput(inputPointId);
     }
     if(active){
-        return (<InputOutputPointActive onDoubleClick={setActiveInactive} style={{ borderColor }} id={inputPointId} onClick={onSetInputPoint}/>);
+        return (
+            <InputOutputPointActive 
+                onDoubleClick={setActiveInactive}
+                style={{ borderColor }}
+                id={inputPointId}
+                onClick={onSetInputPoint}
+                onMouseOver={() => setIsMouseOver(true)} 
+                onMouseLeave={() => setIsMouseOver(false)}
+            >
+                {isMouseOver && (
+                    <TrashElement style={{top: '-1rem', right: '-1rem'}} onClick={onRemovePoint}/>
+                )}
+            </InputOutputPointActive>
+        );
     }
-    return (<InputOutputPoint onDoubleClick={setActiveInactive} style={{ borderColor }} id={inputPointId} onClick={onSetInputPoint}/>);
+    return (
+        <InputOutputPoint
+            onDoubleClick={setActiveInactive}
+            style={{ borderColor }}
+            id={inputPointId}
+            onClick={onSetInputPoint}
+            onMouseOver={() => setIsMouseOver(true)} 
+            onMouseLeave={() => setIsMouseOver(false)}
+        >
+            {isMouseOver && (
+                <TrashElement style={{top: '-1rem', right: '-1rem'}} onClick={onRemovePoint}/>
+            )}
+        </InputOutputPoint>
+    );
 }
 
-const OutputPoint: React.FC<{outputPointId: string, active: boolean}> = ({outputPointId, active}) => {
-    const {connectPoints, getActiveLayer} = useChipLayers();
-    const activeLayer = getActiveLayer();
+const OutputPoint: React.FC<{outputPointId: string, active: boolean}> = ({outputPointId, active}) => { 
+    const [isMouseOver, setIsMouseOver] = useState(false);   
+    const wires = useChipLayer(state => state.wires);
     let bgColor = 'gray';
-
-    if(activeLayer){
-        const {wires} = activeLayer;
-        const wire = wires.find(({chipInputId}) => chipInputId === outputPointId);
-        if(wire?.active){
-            bgColor = 'red';
-        }
+    const wire = wires.find(({chipInputId}) => chipInputId === outputPointId);
+    if(wire?.active){
+        bgColor = '#a00';
     }
-
     const onConnectPoint = () => {
-        connectPoints(outputPointId);
+        useChipLayer.getState().connectPoints(outputPointId);
     }
+
+    const onRemovePoint = () => {
+        useChipLayer.getState().removeOutput(outputPointId);
+    }
+
     if(active){
         return (
             <InputOutputPointActive
@@ -84,7 +128,13 @@ const OutputPoint: React.FC<{outputPointId: string, active: boolean}> = ({output
                 }} 
                 onClick={onConnectPoint}
                 id={outputPointId}
-            />
+                onMouseOver={() => setIsMouseOver(true)} 
+                onMouseLeave={() => setIsMouseOver(false)}
+            >
+                {isMouseOver && (
+                    <TrashElement style={{top: '-1rem', left: '-1rem'}} onClick={onRemovePoint}/>
+                )}
+            </InputOutputPointActive>
         );
     }
     return (
@@ -94,7 +144,13 @@ const OutputPoint: React.FC<{outputPointId: string, active: boolean}> = ({output
             }} 
             onClick={onConnectPoint}
             id={outputPointId}
-        />
+            onMouseOver={() => setIsMouseOver(true)} 
+            onMouseLeave={() => setIsMouseOver(false)}
+        >
+            {isMouseOver && (
+                <TrashElement style={{top: '-1rem', left: '-1rem'}} onClick={onRemovePoint}/>
+            )}  
+        </InputOutputPoint>
     );
 }
 

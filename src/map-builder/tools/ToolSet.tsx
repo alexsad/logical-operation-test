@@ -56,6 +56,7 @@ const ToolSet: React.FC = () => {
                 id: layer.id,
                 name: layer.name,
                 version: layer.version,
+                instInputDeps: [],
                 inputs: [
                     ...layer.inputs                    
                 ],
@@ -88,6 +89,7 @@ const ToolSet: React.FC = () => {
             ],
             position: { x: 0, y: 0},
             originLayerId: 'not',
+            instInputDeps: [],
         },
         {
             id: 'and',
@@ -111,6 +113,7 @@ const ToolSet: React.FC = () => {
             ],
             position: { x: 0, y: 0},
             originLayerId: 'and',
+            instInputDeps:[],
         },
         ...publishedLayer,
     ];

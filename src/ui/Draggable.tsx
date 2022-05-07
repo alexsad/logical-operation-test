@@ -2,16 +2,21 @@ import React, { useEffect, useRef } from 'react';
 import dropCursor from './assets/cursor/drag-target-full.png';
 import styled from 'styled-components';
 
-
 export interface IDroppableEvent {
     target: HTMLElement,
     currentTarget?: EventTarget & HTMLElement | null;
+    mousePosition: {
+        x: number,
+        y: number,
+    },
 }
+
 export interface IDraggable {
     data: string;
     refElement: React.RefObject<HTMLElement>;
     onDrop?: (data: string, event: IDroppableEvent) => void,
 }
+
 export interface IDroppable {
     onDrop: (data: string, event: IDroppableEvent) => void,
     refElement: React.RefObject<HTMLElement>;
@@ -26,7 +31,6 @@ const DraggableImg = styled.img`
 // let touchDataTransfer = '';
 const TOUCH_DROP_EVENT = 'TOUCH:DROP';
 const DROP_END_EVENT = 'DROP:END';
-
 
 const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) => {
     const refDragImag = useRef<HTMLImageElement>(null);
@@ -86,7 +90,13 @@ const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) =
                     if(dropElement){
                         const detail = { 
                             text: data,
-                            event: { target: dropElement } as IDroppableEvent,
+                            event: { 
+                                target: dropElement,
+                                mousePosition: {
+                                    x: evt.clientX,
+                                    y: evt.clientY,
+                                }
+                            } as IDroppableEvent,
                         };
 
                         if(onDrop){
@@ -105,6 +115,9 @@ const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) =
         }
 
         function onDropEndHandler(e: Event){
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
             const {detail} = e as CustomEvent<{text: string, event: IDroppableEvent}>;
             if(detail && detail.text && onDrop){
                 onDrop(detail.text, detail.event);
@@ -117,7 +130,7 @@ const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) =
             currentElement.addEventListener('touchmove', onTouchMove,  {passive: true});
             currentElement.addEventListener('touchstart', onTouchStart,  {passive: true});
             currentElement.addEventListener('touchend', onTouchEnd,  {passive: true});
-            document.body.addEventListener(DROP_END_EVENT, onDropEndHandler);
+            globalThis.addEventListener(DROP_END_EVENT, onDropEndHandler);
         }
 
         return () => {
@@ -127,7 +140,7 @@ const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) =
                 currentElement.removeEventListener('touchmove', onTouchMove);
                 currentElement.removeEventListener('touchstart', onTouchStart);
                 currentElement.removeEventListener('touchend', onTouchEnd);
-                document.body.removeEventListener(DROP_END_EVENT, onDropEndHandler);
+                globalThis.removeEventListener(DROP_END_EVENT, onDropEndHandler);
             }
         }
 
@@ -158,14 +171,27 @@ const Droppable: React.FC<IDroppable> = ({children, refElement, onDrop}) => {
             if(dataText){
                 const target = evt.target as HTMLDivElement;
                 const {currentTarget} = evt;              
-                onDrop(dataText, {target, currentTarget: currentTarget as HTMLElement | null});
+                onDrop(dataText, {
+                    target, 
+                    currentTarget: currentTarget as HTMLElement | null,
+                    mousePosition: {
+                        x: evt.clientX,
+                        y: evt.clientY,
+                    },
+                });
 
                 const detail = { 
                     text: dataText,
-                    event: { target } as IDroppableEvent,
+                    event: { 
+                        target,
+                        mousePosition: {
+                            x: evt.clientX,
+                            y: evt.clientY,
+                        },
+                    } as IDroppableEvent,
                 };
 
-                document.body.dispatchEvent(
+                globalThis.dispatchEvent(
                     new CustomEvent(DROP_END_EVENT, { 
                         detail,
                         bubbles: true,

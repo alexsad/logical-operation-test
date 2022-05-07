@@ -61,7 +61,7 @@ const AppWrap = styled.div`
   // overflow: hidden;
 `;
 
-const MapBuilder = React.lazy(() => import('./map-builder/MapBuilder'));
+const Builder = React.lazy(() => import('./map-builder/Builder'));
 
 function App() {
   return (
@@ -73,9 +73,9 @@ function App() {
                   <Switch>
                     <GameFrame>
                         <Sign>                  
-                        <Route path="/" exact={true} component={MapBuilder} />
-                          <Route path="/map-builder" render={
-                          () => <MapBuilder/>
+                        <Route path="/" exact={true} component={Builder} />
+                          <Route path="/circ-builder" render={
+                          () => <Builder/>
                         } />
                       </Sign>
                     </GameFrame>

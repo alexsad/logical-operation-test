@@ -22,6 +22,7 @@ export interface IChip {
     position: IPosition;
     inputs: IInputOutputPoint[];
     outputs: IInputOutputPoint[];
+    instInputDeps: string[];
     originLayerId: string;
 }
 

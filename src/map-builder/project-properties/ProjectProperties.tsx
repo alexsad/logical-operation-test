@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import TabContainer from '../TabContainer';
 // import { IChipLayer } from '../../interfaces/interfaces';
 import useChipLayers from '../stores/useChipLayers';
+import useChipLayer from '../stores/useChipLayer';
+import { IChipLayer } from '../../interfaces/interfaces';
 
 const ProjectPropertiesWrap = styled.div`
     > .properties-input > label{
@@ -36,20 +38,29 @@ const ProjectPropertiesWrap = styled.div`
     }
 `;
 
-const ProjectProperties: React.FC =  () => {
-    const [levelName, setLevelName] = useState('level-project');
+interface IProjectStructure {
+    projectName: string,
+    layers: IChipLayer[],
+}
 
-    const updateLevelName = ({target}:React.ChangeEvent<HTMLInputElement>) => {
-        setLevelName(target.value);
+const ProjectProperties: React.FC =  () => {
+    const [projectName, setProjectName] = useState('level-project');
+
+    const updateProjectName = ({target}:React.ChangeEvent<HTMLInputElement>) => {
+        setProjectName(target.value);
     }
 
     const downloadProject = () => {
         const layers = useChipLayers.getState().layers;
-        const projectStr = JSON.stringify(layers);
+        const projectStructure: IProjectStructure = {
+            layers,
+            projectName: projectName,
+        }
+        const projectStr = JSON.stringify(projectStructure);
         const element = document.createElement("a");
         const file = new Blob([projectStr], {type: 'text/json'});
         element.href = URL.createObjectURL(file);
-        element.download = `${levelName}.json`;
+        element.download = `${projectName}.json`;
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
     }
@@ -68,12 +79,38 @@ const ProjectProperties: React.FC =  () => {
 				alert("Error while reading file");
 				return;
 			}
-            // const projectStructure = JSON.parse(evt.target.result) as IChipLayer[];
-            // setLevelName(evt.target)
-            // useChipLayers.getState().setAllLayers(projectStructure);
+            const {projectName, layers} = JSON.parse(evt.target.result) as IProjectStructure;
+            setProjectName(projectName)
+
+            useChipLayers.getState().setActiveLayerId('');
+            useChipLayers.getState().setLayers(layers);
+            if(!!layers.length){
+                const lastLayer = layers[layers.length-1];
+                useChipLayers.getState().setActiveLayerId(lastLayer.id);
+                useChipLayer.getState().updateLayer(lastLayer);
+            }
         };
 		reader.readAsText((target as unknown as {files:Blob[]}).files[0]);
     }
+
+    useEffect(() => {
+        const {updateLayer} = useChipLayer.getState();
+        const {addLayer, setActiveLayerId} = useChipLayers.getState();
+        const nextId = `${new Date().getTime()}`;
+        const newLayer =  {
+            id: nextId,
+            name: '*',
+            version: 0,
+            visible: true,
+            inputs: [],
+            outputs: [],
+            chips: [],
+            wires: [],
+        };
+        updateLayer({...newLayer});
+        addLayer({...newLayer});
+        setActiveLayerId(newLayer.id);
+    },[]);
 
     return (
         <TabContainer title="Project" tabTitle="Configurations">
@@ -82,7 +119,7 @@ const ProjectProperties: React.FC =  () => {
                     <label>
                         Project name:
                         <div className="row">
-                        <input style={{width:'90%'}} type="text" value={levelName} maxLength={40} onChange={updateLevelName} />
+                        <input style={{width:'90%'}} type="text" value={projectName} maxLength={40} onChange={updateProjectName} />
                         </div>
                     </label>
                     <label>
