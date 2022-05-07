@@ -1,5 +1,6 @@
 import create from 'zustand';
 import { IChip, IChipLayer, IInputOutputPoint } from '../../interfaces/interfaces';
+import { nextUID } from '../../util/uuid';
 
 interface ILayersContext extends IChipLayer{
     selectedOutputId: string | null;
@@ -21,7 +22,7 @@ interface ILayersContext extends IChipLayer{
 }
 
 
-const firstLayerId =  `${new Date().getTime()}`;
+const firstLayerId =  `${nextUID()}`;
 
 export default create<ILayersContext>((set, get) => ({
     selectedOutputId: null,
@@ -132,15 +133,23 @@ export default create<ILayersContext>((set, get) => ({
         const inputIndex = inputs.findIndex(({id}) => inputId === id);
         if(inputIndex > -1){
             inputs[inputIndex].active = active;
-            const wire = wires.find(({chipOutputId}) => inputId === chipOutputId);
-            if(wire){
-                wire.active = active;
+            const selectedWires = wires.filter(({chipOutputId}) => inputId === chipOutputId);
+            if(!selectedWires.length){
                 set({
-                    wires: [...wires],
                     inputs: [...inputs],
                 });
-            }else{
+                return;
+            }
+            let hasChange = false;
+            selectedWires.forEach(wire => {
+                if(wire.active !== active){
+                    wire.active = active;
+                    hasChange = true;
+                }
+            });
+            if(hasChange){
                 set({
+                    wires: [...wires],
                     inputs: [...inputs],
                 });
             }
@@ -149,7 +158,7 @@ export default create<ILayersContext>((set, get) => ({
     activateWire: (wireId: string, active: boolean) => {
         const {wires} = get();
         const wire = wires.find(({id}) => id === wireId);
-        if(wire){
+        if(!!wire && wire.active !== active){
             wire.active = active;
             set({
                 wires: [...wires]
@@ -157,10 +166,19 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     addChip: (chip: IChip) => {
-        const {chips, id: layerId} = get();
+        const {chips} = get();
+        const newChipId = `${nextUID()}`;
         chips.push({
             ...chip,
-            id: `${layerId}_${new Date().getTime()}`,
+            id: newChipId,
+            outputs: chip.outputs.map((output, output_index) => ({
+                ...output,
+                id: `${newChipId}_${output_index}_out`,
+            })),
+            inputs: chip.inputs.map((input, input_index) => ({
+                ...input,
+                id: `${newChipId}_${input_index}_inp`,
+            }))
         });
         set({
             chips: [...chips]
@@ -170,7 +188,7 @@ export default create<ILayersContext>((set, get) => ({
         const {chips} = get();
         const chipIndex = chips.findIndex(({id}) => chip.id === id);
         if(chipIndex > -1){
-            chips[chipIndex] = {...chip};
+            chips[chipIndex].position = {...chip.position};
             set({
                 chips: [...chips]
             });
@@ -178,9 +196,10 @@ export default create<ILayersContext>((set, get) => ({
     },
     addInpuPoint: (point: IInputOutputPoint) => {
         const {inputs, id: layerId} = get();
+        const newId = `${layerId}_inp_point_${nextUID()}`;
         inputs.push({
             ...point,
-            id: `${layerId}_${new Date().getTime()}`,
+            id: newId,
         });
         set({
             inputs: [...inputs]
@@ -188,9 +207,10 @@ export default create<ILayersContext>((set, get) => ({
     },
     addOutPoint: (point: IInputOutputPoint) => {
         const {outputs, id: layerId} = get();
+        const newId = `${layerId}_out_point_${nextUID()}`;
         outputs.push({
             ...point,
-            id: `${layerId}_${new Date().getTime()}`,
+            id: newId,
         });
         set({
             outputs: [...outputs]
@@ -202,32 +222,51 @@ export default create<ILayersContext>((set, get) => ({
         });
     },
     setSelectedOutputId: (outputId: string) => {
-        const {wires} = get();
-        const wire = wires.find(wire => [wire.chipInputId, wire.chipOutputId].includes(outputId));
-        if(!wire){
+        // const {wires} = get();
+        // const wire = wires.find(wire => [wire.chipInputId, wire.chipOutputId].includes(outputId));
+        // if(!wire){
             set({
                 selectedOutputId: outputId,
             });
-        }
+        // }
     },
     connectPoints: (inputId: string) => {
-        const {selectedOutputId, wires} = get();
+        const {selectedOutputId, wires, chips, outputs, inputs} = get();
         if(!!selectedOutputId){
             const wire = wires.find(wire => [wire.chipInputId, wire.chipOutputId].includes(inputId));
-            if(!wire){
-                wires.push({
-                    ...{
-                        chipInputId: inputId,
-                        chipOutputId: selectedOutputId,
-                        active: false,
-                        id: `${selectedOutputId}_${selectedOutputId}`,
-                    },
-                });
-                set({
-                    wires: [...wires],
-                    selectedOutputId: null,
-                });
+
+            if(!!wire){
+                // avoid duplicate connection
+                return;
             }
+
+            const targets = [
+                    ...chips
+                        .filter(chip => [
+                            ...[...chip.outputs, ...chip.inputs].map(({id}) => id),
+                        ].some(id => [inputId, selectedOutputId].includes(id)))
+                        .map(({id}) => id),
+                    ...[...outputs, ...inputs].map(({id}) => id)
+                        .filter(id => [inputId, selectedOutputId].includes(id)),
+            ];
+
+            if(targets.length < 2){
+                // avoid connection to same chip
+                return;
+            }
+
+            wires.push({
+                ...{
+                    id: `${nextUID()}`,
+                    chipInputId: inputId,
+                    chipOutputId: selectedOutputId,
+                    active: false,
+                },
+            });
+            set({
+                wires: [...wires],
+                selectedOutputId: null,
+            });
         }
     },
 }));

@@ -2,6 +2,7 @@ import create from 'zustand';
 
 import { IChipLayer, IInputOutputPoint } from '../../interfaces/interfaces';
 import {LAYERS_STORE_KEY, openLayerStore} from '../../stores/idb-layers-store';
+import { nextUID } from '../../util/uuid';
 
 type layerAsFunction = (...inputs: boolean[]) => boolean[];
 
@@ -56,7 +57,7 @@ export default create<ILayersContext>((set, get) => ({
         });      
     },
     getNewLayer: () => {
-        const nextId = `${new Date().getTime()}`;
+        const nextId = `${nextUID()}`;
         return  {
             id: nextId,
             name: '*',

@@ -23,17 +23,6 @@ const LayersWrap = styled.div`
     box-sizing: border-box;
 `;
 
-const LayersTitle = styled.div`
-    width: calc(100% - 0.8rem);
-    float: left;
-    margin: 0.2rem;
-    padding: 0.2rem;
-    position: relative;
-    color: rgb(78, 78, 78);
-    text-align: left;
-    font-size: 12px;
-`;
-
 interface RowProps {
     isSelected: boolean;
 }
@@ -59,9 +48,10 @@ const LayerRow = styled.div<RowProps>`
     > input[type=text] {
         width: 110px;
     }
-    > label {
-        width: 110px;
-    }
+`;
+
+const LayerName = styled.label`
+    width: 110px;
 `;
 
 const Layers: React.FC = () => {
@@ -118,9 +108,6 @@ const Layers: React.FC = () => {
     return (
         <TabContainer title="Layers" tabTitle="Layers">
             <LayersWrap>
-                <LayersTitle>
-                    <label>Visible?</label>
-                </LayersTitle>
                 {layers.map(layer => (
                     <LayerRow key={`${layer.id}`} isSelected={layer.id === activeLayerId} onClick={() => changeLayerVisibility(layer.id)}>
                         {layer.version === 0 && (
@@ -131,7 +118,7 @@ const Layers: React.FC = () => {
                         )}
                         {layer.version > 0 && (
                             <>
-                                <label htmlFor={`${layer.id}`}>{layer.name}-{layer.version}</label>
+                                <LayerName htmlFor={`${layer.id}`}>{layer.name}-{layer.version}</LayerName>
                                 <button onClick={() => onRepublish(layer.id)}>republish</button>
                                 <RemoveBtn onClick={() => onRemove(layer.id)}/>
                             </>

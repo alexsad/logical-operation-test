@@ -95,18 +95,8 @@ const ProjectProperties: React.FC =  () => {
 
     useEffect(() => {
         const {updateLayer} = useChipLayer.getState();
-        const {addLayer, setActiveLayerId} = useChipLayers.getState();
-        const nextId = `${new Date().getTime()}`;
-        const newLayer =  {
-            id: nextId,
-            name: '*',
-            version: 0,
-            visible: true,
-            inputs: [],
-            outputs: [],
-            chips: [],
-            wires: [],
-        };
+        const {addLayer, setActiveLayerId, getNewLayer} = useChipLayers.getState();
+        const newLayer =  getNewLayer();
         updateLayer({...newLayer});
         addLayer({...newLayer});
         setActiveLayerId(newLayer.id);

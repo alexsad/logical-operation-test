@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { IChip } from '../../interfaces/interfaces';
 import { Draggable, IDroppableEvent } from '../../ui/Draggable';
@@ -15,12 +15,11 @@ const ChipWrapper = styled.div`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    top:150px;
-    left:150px;
     cursor:move;
     border-radius: .4rem;
     border: 2px solid #181818;
-    z-index:1;
+    z-index: 0;
+    position: relative;
 `;
 
 const ChipDescription = styled.div`
@@ -47,6 +46,7 @@ const ChipInputBox = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    z-index: 2;
 `;
 
 const ChipInputRightBox = styled(ChipInputBox)``;
@@ -54,10 +54,11 @@ const ChipInputRightBox = styled(ChipInputBox)``;
 const ChipInputOutput = styled.div`
     width: 10px;
     height: 10px;
-    background-color: gray;
+    background-color: #2d2d2d;
     border-radius: 50%;
     margin:.4rem;
     border: 1px solid transparent;
+    z-index:4;
 `;
 
 const ChipEndurenceWrap = styled(ChipWrapper)`
@@ -65,7 +66,7 @@ const ChipEndurenceWrap = styled(ChipWrapper)`
 `;
 
 const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active}) => {
-    const bgColor = active ? '#a00' : 'gray';
+    const bgColor = active ? '#a00' : '#2d2d2d';
     const onSetInputId = () => {
         useChipLayer.getState().connectPoints(inputId);
     }
@@ -84,7 +85,7 @@ const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active
 
 const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: string, active: boolean, isSelectedOutputId: boolean}> = ({outputId, active}) => {
     const selectedOutputId = useChipLayer(state => state.selectedOutputId);
-    const bgColor = active ? '#a00' : 'gray';
+    const bgColor = active ? '#a00' : '#2d2d2d';
     const borderColor =  selectedOutputId === outputId ? 'yellow' : 'transparent';
 
     const connectPoints = () => {
@@ -97,20 +98,21 @@ const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: stri
 }
 
 const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, originLayerId}) => {
-    const [isMouseOver, setIsMouseOver] = useState(false);
     const customInputs = [...inputs];
     const customOutputs = [...outputs];
     const wires = useChipLayer(state => state.wires);
 
-    const getWireByInputId = (inputId: string) => wires.find(({chipInputId}) => chipInputId === inputId);
-    const getWireByOutputId = (outputId: string) => wires.find(({chipOutputId}) => chipOutputId === outputId);
+    const getWireByInputId = (inputId: string) => wires.filter(({chipInputId}) => chipInputId === inputId);
+    const getWireByOutputId = (outputId: string) => wires.filter(({chipOutputId}) => chipOutputId === outputId);
     customInputs.forEach(input => {
-        const wire = getWireByInputId(input.id);
-        if(!!wire && wire.active){
-            input.active = wire.active;
-        }else{
-            input.active = false;
-        }
+        const wiresIn = getWireByInputId(input.id);
+        wiresIn.forEach(wire => {
+            if(!!wire && wire.active){
+                input.active = wire.active;
+            }else{
+                input.active = false;
+            }
+        })
     });
 
     const outputProcesseds: boolean[] = [];
@@ -126,12 +128,14 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
         }else{
             output.active = false;
         }
-        const wire = getWireByOutputId(output.id);
-        if(!!wire && wire.active !== outputProcessed){
-            setTimeout(() => {
-                useChipLayer.getState().activateWire(wire.id, !!outputProcessed);
-            }, 1000);
-        }
+        const wiresOut = getWireByOutputId(output.id);
+        wiresOut.forEach(wire => {
+            if(!!wire && wire.active !== outputProcessed){
+                setTimeout(() => {
+                    useChipLayer.getState().activateWire(wire.id, !!outputProcessed);
+                }, 500);
+            }
+        });
     });
 
     const onRemoveChip = () => {
@@ -139,10 +143,8 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
     }
 
     return (
-        <ChipEndurenceWrap onMouseOver={() => setIsMouseOver(true)} onMouseLeave={() => setIsMouseOver(false)}>
-            {isMouseOver && (
-                <TrashElement onClick={onRemoveChip} style={{top: '-1.5rem', right: '-1rem'}}/>
-            )}
+        <ChipEndurenceWrap>
+            <TrashElement onClick={onRemoveChip} top={-1.5} right={-1.5}/>
             <ChipInputBox>
                 {customInputs.map((input) => (
                     <ChipInput 
@@ -263,26 +265,9 @@ const ChipPreview: React.FC<IChip> = (chip) => {
             }
         }
     }
-    const newChip = (pchip: IChip) => {
-        const newChipId = `chip_inst_${new Date().getTime()}`;
-        return {
-            ...pchip,
-            ...{
-                id: newChipId,
-                outputs: pchip.outputs.map((output, output_index) => ({
-                    ...output,
-                    id: `${newChipId}_${output_index}_out`,
-                })),
-                inputs: pchip.inputs.map((input, input_index) => ({
-                    ...input,
-                    id: `${newChipId}_${input_index}_inp`,
-                }))
-            }
-        }
-    }
 
     return (
-        <Draggable onDrop={handlerDrop} data={JSON.stringify(newChip(chip))} refElement={dragRef}>
+        <Draggable onDrop={handlerDrop} data={JSON.stringify(chip)} refElement={dragRef}>
             <ChipWrapper 
                 style={{
                     position: 'relative',
