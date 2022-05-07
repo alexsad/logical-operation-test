@@ -52,7 +52,6 @@ const SubStageBox = styled.div`
     position: relative;
     display: flex;
     flex-direction: row;
-    background-color: aqua;
 `;
 
 const InputOutputBox = styled.div`
