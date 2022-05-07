@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import dropCursor from './assets/cursor/drag-target-full.png';
+import dropCursor from './assets/cursor/chip_icon_32x32.png';
 import styled from 'styled-components';
 
 export interface IDroppableEvent {
