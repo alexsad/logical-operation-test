@@ -104,7 +104,9 @@ export default create<ILayersContext>((set, get) => ({
     publishLayer: async (layerToSave: IChipLayer) => {
         const {layers, layerFns} = get();
         const generateFunctionFromLayer = (pLayer: IChipLayer) => {
-            let fnBody = ``;
+            let fnBody = `
+                const _this = this;
+            `;
             const {wires, chips, outputs, inputs: inputPoints} = pLayer;
             const outputsLength = outputs.length;
             const chipsLength = chips.length;
@@ -130,7 +132,7 @@ export default create<ILayersContext>((set, get) => ({
                             chipArgsStr.push(`inputs[${inputLayerIndex}]`);
                         }else{
                             const shipOutput = getChipByOutputId(wire.chipOutputId);
-                            chipArgsStr.push(`chip_inst_${shipOutput?.chip?.id}[${shipOutput?.chipOutputIndex}]`);
+                            chipArgsStr.push(`chip_inst_${shipOutput?.chip?.id}.getOutput(${shipOutput?.chipOutputIndex})`);
                         }
                     }else{
                         chipArgsStr.push('false');
@@ -183,7 +185,33 @@ export default create<ILayersContext>((set, get) => ({
                 const chipInst = chips[i];
                 const chipInstVar = `chip_inst_${chipInst.id}`;
                 fnBody += `
-                    const ${chipInstVar} =  this.fn_${chipInst.originLayerId}(
+                    const ${chipInstVar} = {
+                        outputs: Array.from({length: ${chipInst.outputs.length}}, () => false),
+                        inputs: Array.from({length: ${chipInst.inputs.length}}, () => false),
+                        setInputs:(...values) => {
+                            if(values.length === ${chipInstVar}.inputs.length){
+                                ${chipInstVar}.inputs = [...values];
+                                ${chipInstVar}.outputs = [
+                                    ..._this.fn_${chipInst.originLayerId}(
+                                        ...${chipInstVar}.inputs
+                                    )
+                                ]
+                            }
+                        },
+                        getOutput: (posi) => {
+                            if(posi < ${chipInstVar}.outputs.length){
+                                return ${chipInstVar}.outputs[posi];
+                            }
+                            return false;
+                        },
+                    }
+                `;
+            }
+            for(let i = 0; i < chipsLength; i++){
+                const chipInst = chips[i];
+                const chipInstVar = `chip_inst_${chipInst.id}`;
+                fnBody += `
+                    ${chipInstVar}.setInputs(
                         ${ getArgments(chipInst.inputs) }
                     );
                 `;

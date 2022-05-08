@@ -7,11 +7,13 @@ import useChipLayer from '../stores/useChipLayer';
 const LineToWrap = styled.div`
     width: 1px;
     height: 100px;
+    box-sizing: border-box;
     background-color: #2d2d2d;
     position: absolute;
     z-index: 1;
     border: .5px solid transparent;
-    box-sizing: border-box;
+    border-left-width: 0px;
+    border-right-width: 0px;
 `;
 
 const LineToBox = styled.div`
