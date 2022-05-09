@@ -80,7 +80,7 @@ const DropStage: React.FC = () => {
 
     return (
         <Droppable refElement={dropRef} onDrop={onDropHandler}>
-            <SubStageBox draggable={true} ref={dropRef}>
+            <SubStageBox draggable={false} ref={dropRef}>
                 <Chips/>
                 <Wires/>
             </SubStageBox>
