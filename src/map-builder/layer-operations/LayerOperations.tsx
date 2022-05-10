@@ -6,9 +6,10 @@ import floppyDiskIcon from '../assets/floppydiskmono_105949_white.png';
 import arrowLeftIcon from '../assets/arrow-left-white.png';
 import useChipLayer from '../stores/useChipLayer';
 import { debounce } from '../../util/debounce';
+import colors from '../../ui/colors';
 
 const LayerOperationsWrap = styled.div`
-    background-color: #a00;
+    background-color: ${colors['gray.100']};
     width: 100%;
     padding: .5rem;
     display: flex;

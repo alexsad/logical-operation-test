@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { IWire } from '../../interfaces/interfaces';
+import colors from '../../ui/colors';
 import { SimpleTrashElement } from '../float-remove-btn/FloatRemoveBtn';
 import useChipLayer from '../stores/useChipLayer';
 
@@ -8,7 +9,7 @@ const LineToWrap = styled.div`
     width: 1px;
     height: 100px;
     box-sizing: border-box;
-    background-color: #2d2d2d;
+    background-color: ${colors['gray.100']};
     position: absolute;
     z-index: 1;
     border: .5px solid transparent;
@@ -110,7 +111,7 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
     return (
         <>
             <LineToWrap 
-                style={{backgroundColor: active ? '#a00' : '#2d2d2d', borderColor: isSelected ? 'yellow' : 'transparent'}}
+                style={{backgroundColor: active ? colors['red.100'] : colors['gray.100'], borderColor: isSelected ? colors['yellow.100'] : 'transparent'}}
                 ref={elRef}
                 onClick={onClick}
             >

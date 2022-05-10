@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { IChip } from '../../interfaces/interfaces';
+import colors from '../../ui/colors';
 import { Draggable, IDroppableEvent } from '../../ui/Draggable';
 import TrashElement from '../float-remove-btn/FloatRemoveBtn';
 import useChipLayer from '../stores/useChipLayer';
@@ -9,7 +10,7 @@ import useChipLayers from '../stores/useChipLayers';
 const ChipWrapper = styled.div`
     width: auto;
     height: auto;
-    background-color: #4d4d4d;
+    background-color: ${colors['gray.900']};
     padding: 0rem;
     display: flex;
     flex-direction: row;
@@ -17,7 +18,7 @@ const ChipWrapper = styled.div`
     align-items: center;
     cursor:move;
     border-radius: .4rem;
-    border: 2px solid #181818;
+    border: 2px solid ${colors['black.100']};
     z-index: 0;
     position: relative;
 `;
@@ -54,7 +55,7 @@ const ChipInputRightBox = styled(ChipInputBox)``;
 const ChipInputOutput = styled.div`
     width: 10px;
     height: 10px;
-    background-color: #2d2d2d;
+    background-color: ${colors['gray.100']};
     border-radius: 50%;
     margin:.4rem;
     border: 1px solid transparent;
@@ -68,14 +69,14 @@ const ChipEndurenceWrap = styled(ChipWrapper)`
 const LCDChipDisplay = styled.div`
     font-family:'lcd_font';
     font-size: 3rem;
-    color: #a00;
+    color: ${colors['red.100']};
     margin-bottom: 0.1rem;
     width: 100%;
     text-align: center;
 `;
 
 const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active}) => {
-    const bgColor = active ? '#a00' : '#2d2d2d';
+    const bgColor = active ? colors['red.100'] : colors['gray.100'];
     const onSetInputId = () => {
         useChipLayer.getState().connectPoints(inputId);
     }
@@ -94,8 +95,8 @@ const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active
 
 const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: string, active: boolean, isSelectedOutputId: boolean}> = ({outputId, active}) => {
     const selectedOutputId = useChipLayer(state => state.selectedOutputId);
-    const bgColor = active ? '#a00' : '#2d2d2d';
-    const borderColor =  selectedOutputId === outputId ? 'yellow' : 'transparent';
+    const bgColor = active ? colors['red.100'] : colors['gray.100'];
+    const borderColor =  selectedOutputId === outputId ? colors['yellow.100'] : 'transparent';
 
     const connectPoints = () => {
         useChipLayer.getState().setSelectedOutputId(outputId);
