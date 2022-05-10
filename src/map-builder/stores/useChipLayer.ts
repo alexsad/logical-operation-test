@@ -19,6 +19,8 @@ interface ILayersContext extends IChipLayer{
     removeChip: (idChip: string) => void;
     removeOutput: (idOutput: string) => void;
     removeInput: (idInput: string) => void;
+    changeInputLabel: (pointId: string, label: string) => void;
+    changeOutputLabel: (pointId: string, label: string) => void;
 }
 
 
@@ -266,6 +268,26 @@ export default create<ILayersContext>((set, get) => ({
             set({
                 wires: [...wires],
                 selectedOutputId: null,
+            });
+        }
+    },
+    changeInputLabel: (pointId: string, label: string) => {
+        const {inputs} = get();
+        const pointIndex = inputs.findIndex(input => input.id === pointId);
+        if(pointIndex > -1){
+            inputs[pointIndex].label = label;
+            set({
+                inputs: [...inputs],
+            });
+        }
+    },
+    changeOutputLabel: (pointId: string, label: string) => {
+        const {outputs} = get();
+        const pointIndex = outputs.findIndex(outpoint => outpoint.id === pointId);
+        if(pointIndex > -1){
+            outputs[pointIndex].label = label;
+            set({
+                outputs: [...outputs],
             });
         }
     },

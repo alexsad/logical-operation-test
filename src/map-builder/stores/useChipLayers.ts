@@ -37,6 +37,9 @@ const basicLayerFns = {
         }
         return [false];
     },
+    fn_binary_display: (...args: boolean[]) => {
+        return args;
+    },
 }
 
 export default create<ILayersContext>((set, get) => ({

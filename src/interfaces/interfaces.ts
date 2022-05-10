@@ -6,6 +6,7 @@ export interface IPosition {
 export interface IInputOutputPoint {
     active: boolean;
     id: string;
+    label: string;
 }
 
 export interface IWire {
