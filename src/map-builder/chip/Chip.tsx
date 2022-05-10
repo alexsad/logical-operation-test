@@ -65,6 +65,15 @@ const ChipEndurenceWrap = styled(ChipWrapper)`
 
 `;
 
+const LCDChipDisplay = styled.div`
+    font-family:'lcd_font';
+    font-size: 3rem;
+    color: #a00;
+    margin-bottom: 0.1rem;
+    width: 100%;
+    text-align: center;
+`;
+
 const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active}) => {
     const bgColor = active ? '#a00' : '#2d2d2d';
     const onSetInputId = () => {
@@ -154,12 +163,21 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
                     />
                 ))}
             </ChipInputBox>
-            <ChipDescription>
+            {originLayerId === 'binary_display' && ( 
+                <ChipDescription>            
+                    <LCDChipDisplay>
+                        {parseInt( outputProcesseds.map(v => v ? '1' : '0').join('') , 2)}
+                    </LCDChipDisplay>
+                    <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
+                </ChipDescription>
+            )}
+            {originLayerId !== 'binary_display' && (
+                <ChipDescription>
                     {name}
-                <ChipDescriptionVersion>
-                    {version}_{id}
-                </ChipDescriptionVersion>
-            </ChipDescription>
+                    <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
+                </ChipDescription>
+            )}
+
             <ChipInputRightBox>
                 {customOutputs.map((output) => (
                     <ChipOutput 
@@ -266,6 +284,27 @@ const ChipPreview: React.FC<IChip> = (chip) => {
         }
     }
 
+    const setActiveLayer = () => {
+        if(['not', 'and', 'binary_display'].includes(chip.originLayerId)){
+            return;
+        }
+        const layerId = chip.id;
+        const {activeLayerId, setActiveLayerId, getActiveLayer, updateLayer: updateLayerOnLayers} = useChipLayers.getState();
+        if(activeLayerId === layerId){
+            return;
+        }
+        const {updateLayer, getLayer} = useChipLayer.getState();
+        const layer = getLayer();
+        if(layer.version < 1){
+            updateLayerOnLayers(layer);
+        }
+        setActiveLayerId(layerId);
+        const activeLayer = getActiveLayer();
+        if(!!activeLayer){
+            updateLayer(activeLayer);
+        }
+    }
+
     return (
         <Draggable onDrop={handlerDrop} data={JSON.stringify(chip)} refElement={dragRef}>
             <ChipWrapper 
@@ -275,6 +314,7 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                     left: `0px`,
                 }}
                 ref={dragRef}
+                onDoubleClick={setActiveLayer}
             >
                 <ChipInputBox>
                     {inputs.map((input) => (
@@ -288,7 +328,7 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                 <ChipDescription>
                         {name}
                     <ChipDescriptionVersion>
-                        {version}_{id}
+                        version: {version}
                     </ChipDescriptionVersion>
                 </ChipDescription>
                 <ChipInputRightBox>

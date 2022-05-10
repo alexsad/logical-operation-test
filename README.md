@@ -1,4 +1,13 @@
-# Getting Started with Create React App
+# Basic logical operator builder
+
+if you need to understand how logical operators work, this platform is for you.
+
+you can use the online version [here](https://logical-operators-test.netlify.app/).
+
+
+![alt text](https://logical-operators-test.netlify.app/assets/preview/project-example.jpg)
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

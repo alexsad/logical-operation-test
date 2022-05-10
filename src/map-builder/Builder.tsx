@@ -5,11 +5,11 @@ import styled from 'styled-components';
 import buildBgEditor from './assets/bg-build.png';
 import Chip from './chip/Chip';
 import LineTo from './line-to/LineTo';
-import Layers from './layers/Layers';
 import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
 import useChipLayer from './stores/useChipLayer';
 import { IChip } from '../interfaces/interfaces';
 import { Droppable, IDroppableEvent } from '../ui/Draggable';
+import LayerOperations from './layer-operations/LayerOperations';
 
 const BuilderWrap = styled.div`
     box-sizing: border-box;
@@ -19,21 +19,33 @@ const BuilderWrap = styled.div`
     background-color: #f0f0f0;
     display: flex;
     flex-flow: row no-wrap;
-    overflow: hidden;   
-
-    > .panel-left, .panel-right{
-        box-sizing: border-box;  
-    }
-
-    > .panel-left{
-        width: 275px;
-    }
-
-    > .panel-right{
-        float: right;
-        width: 250px;
-    }
+    overflow: hidden;
 `;
+
+const Panel = styled.div`
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-flow: row no-wrap;
+    flex-direction: column;
+    overflow: hidden;
+    width: 275px;
+    box-sizing: border-box; 
+`
+
+const CenterPanel = styled.div`
+    box-sizing: border-box;
+    position: relative;
+    height: 100vh;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+    box-sizing: border-box; 
+`
 
 const BoxStage = styled.div`
     flex-grow: 1;
@@ -94,7 +106,7 @@ const Outputs: React.FC = () => {
         <OutputsBox>
             <OutputPointAdd/>
             {outputs.map(output => (
-                <OutputPoint key={`${output.id}`} active={output.active} outputPointId={output.id}/>
+                <OutputPoint key={`${output.id}`} active={output.active} id={output.id} label={output.label}/>
             ))}
         </OutputsBox>
     );
@@ -106,7 +118,7 @@ const Inputs: React.FC = () => {
         <InputsBox>
             <InputPointAdd/>
             {inputs.map(input => (
-                <InputPoint key={`${input.id}`} active={input.active} inputPointId={input.id}/>
+                <InputPoint key={`${input.id}`} active={input.active} id={input.id} label={input.label}/>
             ))}
         </InputsBox>
     );
@@ -167,14 +179,14 @@ const LayerRender: React.FC = () => {
 const Builder: React.FC = () => { 
     return (
         <BuilderWrap>
-            <div className="panel-left">
+            <Panel>
                 <ProjectProperties/>
-                <Layers/>
-            </div>
-            <LayerRender/>
-            <div className="panel-right">
                 <ToolSet/>
-            </div>
+            </Panel>
+            <CenterPanel>
+                <LayerOperations/>
+                <LayerRender/>
+            </CenterPanel>
         </BuilderWrap>
     );
 }
