@@ -10,7 +10,7 @@ const ToolSetWrap = styled.div`
     flex-direction: column;
     width: 100%;
     // border: 1px solid blue;
-    height: calc(100vh - 4.6rem);
+    height: calc(100vh - 16rem);
 
     > .tool-set-options{
         width: 100%;
@@ -31,6 +31,7 @@ const ToolSetWrap = styled.div`
         background-color: lightgrey;
         // border: 1px solid red;
         overflow-y: auto;
+        height: 100%;
 
         > * {
             margin: 5px;
@@ -79,12 +80,14 @@ const ToolSet: React.FC = () => {
                 {
                     id: 'not',
                     active: false,
+                    label: 'in',
                 }
             ],
             outputs: [
                 {
                     id: 'not',
                     active: false,
+                    label: 'out',
                 }
             ],
             position: { x: 0, y: 0},
@@ -97,22 +100,77 @@ const ToolSet: React.FC = () => {
             version: 1,
             inputs: [
                 {
-                    id: 'and_in_1',
+                    id: 'in_1',
                     active: false,
+                    label: 'in_1',
                 },
                 {
-                    id: 'and_in_2',
+                    id: 'in_2',
                     active: false,
+                    label: 'in_2',
                 },
             ],
             outputs: [
                 {
                     id: 'and',
                     active: false,
+                    label: 'out',
                 }
             ],
             position: { x: 0, y: 0},
             originLayerId: 'and',
+            instInputDeps:[],
+        },
+        {
+            id: 'binary_display',
+            name: 'binary_display',
+            version: 1,
+            inputs: [
+                {
+                    id: 'in_1',
+                    active: false,
+                    label: 'in_1',
+                },
+                {
+                    id: 'in_2',
+                    active: false,
+                    label: 'in_2',
+                },
+                {
+                    id: 'in_3',
+                    active: false,
+                    label: 'in_3',
+                },
+                {
+                    id: 'in_4',
+                    active: false,
+                    label: 'in_4',
+                },
+            ],
+            outputs: [
+                {
+                    id: 'out_1',
+                    active: false,
+                    label: 'out_1',
+                },
+                {
+                    id: 'out_2',
+                    active: false,
+                    label: 'out_2',
+                },
+                {
+                    id: 'out_3',
+                    active: false,
+                    label: 'out_3',
+                },
+                {
+                    id: 'out_4',
+                    active: false,
+                    label: 'out_4',
+                },
+            ],
+            position: { x: 0, y: 0},
+            originLayerId: 'binary_display',
             instInputDeps:[],
         },
         ...publishedLayer,

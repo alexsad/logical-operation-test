@@ -31,7 +31,7 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
         var rect = el.getBoundingClientRect();
         return {
             left: rect.left + window.pageXOffset-345,
-            top: rect.top + window.pageYOffset,
+            top: rect.top + window.pageYOffset-54,
             width: rect.width || el.offsetWidth,
             height: rect.height || el.offsetHeight
         };

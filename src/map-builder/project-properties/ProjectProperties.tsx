@@ -44,7 +44,7 @@ interface IProjectStructure {
 }
 
 const ProjectProperties: React.FC =  () => {
-    const [projectName, setProjectName] = useState('level-project');
+    const [projectName, setProjectName] = useState('my-project');
 
     const updateProjectName = ({target}:React.ChangeEvent<HTMLInputElement>) => {
         setProjectName(target.value);
