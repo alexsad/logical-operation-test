@@ -204,7 +204,7 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
                     />
                 ))}
             </ChipInputBox>
-            {originLayerId === "binary_display" && ( 
+            {originLayerId === "decimal_display" && ( 
                 <ChipDescription>
                     <LCDChipDisplay>
                         {parseInt( outputProcesseds.map(v => v ? '1' : '0').join('') , 2)}
@@ -212,7 +212,7 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
                     <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
                 </ChipDescription>
             )}
-            {originLayerId !== "binary_display" && (
+            {originLayerId !== "decimal_display" && (
                 <ChipDescription>
                     <ChipDescriptionName>
                         {name}
@@ -328,7 +328,7 @@ const ChipPreview: React.FC<IChip> = (chip) => {
     }
 
     const setActiveLayer = () => {
-        if(['not', 'and', 'binary_display'].includes(chip.originLayerId)){
+        if(['not', 'and', 'decimal_display'].includes(chip.originLayerId)){
             return;
         }
         const layerId = chip.id;
