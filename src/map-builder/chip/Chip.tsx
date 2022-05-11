@@ -10,56 +10,90 @@ import useChipLayers from '../stores/useChipLayers';
 const ChipWrapper = styled.div`
     width: auto;
     height: auto;
-    background-color: ${colors['gray.900']};
     padding: 0rem;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     cursor:move;
-    border-radius: .4rem;
-    border: 2px solid ${colors['black.100']};
-    z-index: 0;
+    z-index: 2;
     position: relative;
+    align-items: stretch;
 `;
 
 const ChipDescription = styled.div`
     width: auto;
-    height: 100%;
     color: white;
     padding: .5rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     text-transform: uppercase;
+    background-color: transparent;
+    border-radius: .2rem;
+    border: 2px solid ${colors['blue.300']};
+    z-index: 2;
+`;
+
+const ChipDescriptionName = styled.label`
+    width: 100%;
     font-size: .8rem;
-`
+    overflow: hidden;
+`;
+
 const ChipDescriptionVersion = styled.label`
-    width: 50px;
-    height: 100%;
+    width: 100%;
     font-size: .5rem;
     overflow: hidden;
-`
+`;
 
 const ChipInputBox = styled.div`
     width: auto;
     height: auto;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    z-index: 2;
+    justify-content: center;
+    z-index: -2;
 `;
 
 const ChipInputRightBox = styled(ChipInputBox)``;
 
-const ChipInputOutput = styled.div`
+interface ChipInputProps {
+    borderColor: string;
+    bgColor: string;
+}
+
+const ChipInputOutput = styled.div<ChipInputProps>`
     width: 10px;
     height: 10px;
-    background-color: ${colors['gray.100']};
+    background-color: ${({bgColor}) => bgColor};
     border-radius: 50%;
     margin:.4rem;
-    border: 1px solid transparent;
-    z-index:4;
+    border: 2px solid ${({borderColor}) => borderColor};
+    position: relative;
+    z-index: 1;
+    &:after{
+        content: '';
+        display: block;
+        position: absolute;
+        width: 8px;
+        height: 5px;
+        top: 2px;
+        background-color: ${colors['blue.300']};
+        z-index: -2;
+    }
+`;
+
+const ChipInputPoint = styled(ChipInputOutput)`
+    &:after{
+        left: 10px;
+    }
+`;
+
+const ChipOutputPoint = styled(ChipInputOutput)`
+    &:after{
+        right: 10px;
+    }
 `;
 
 const ChipEndurenceWrap = styled(ChipWrapper)`
@@ -69,23 +103,26 @@ const ChipEndurenceWrap = styled(ChipWrapper)`
 const LCDChipDisplay = styled.div`
     font-family:'lcd_font';
     font-size: 3rem;
-    color: ${colors['red.100']};
+    color: ${colors['white.100']};
     margin-bottom: 0.1rem;
     width: 100%;
     text-align: center;
 `;
 
 const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active}) => {
-    const bgColor = active ? colors['red.100'] : colors['gray.100'];
+    const bgColor = active ? colors['blue.200'] : 'transparent';
+    const borderColor = active ? colors['blue.200'] : colors['blue.300'];
     const onSetInputId = () => {
         useChipLayer.getState().connectPoints(inputId);
     }
 
     return (
-        <ChipInputOutput 
+        <ChipInputPoint 
             style={{
                 backgroundColor: bgColor,
-            }} 
+            }}
+            bgColor={bgColor}
+            borderColor={borderColor}
             id={inputId} 
             onClick={onSetInputId}
         />
@@ -95,15 +132,18 @@ const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active
 
 const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: string, active: boolean, isSelectedOutputId: boolean}> = ({outputId, active}) => {
     const selectedOutputId = useChipLayer(state => state.selectedOutputId);
-    const bgColor = active ? colors['red.100'] : colors['gray.100'];
-    const borderColor =  selectedOutputId === outputId ? colors['yellow.100'] : 'transparent';
-
+    const bgColor = active ? colors['blue.200'] : 'transparent';
+    const borderColor =  selectedOutputId === outputId ? colors['yellow.100'] : active ? colors['blue.200'] : colors['blue.300'];
     const connectPoints = () => {
         useChipLayer.getState().setSelectedOutputId(outputId);
     }
 
     return (
-        <ChipInputOutput style={{ borderColor, backgroundColor: bgColor }} onClick={connectPoints} id={outputId}/>
+        <ChipOutputPoint
+            borderColor={borderColor}
+            bgColor={bgColor}
+            onClick={connectPoints} id={outputId}
+        />
     );
 }
 
@@ -154,7 +194,7 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
 
     return (
         <ChipEndurenceWrap>
-            <TrashElement onClick={onRemoveChip} top={-1.5} right={-1.5}/>
+            <TrashElement onClick={onRemoveChip} top={-1.8} right={1.5}/>
             <ChipInputBox>
                 {customInputs.map((input) => (
                     <ChipInput 
@@ -164,17 +204,19 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
                     />
                 ))}
             </ChipInputBox>
-            {originLayerId === 'binary_display' && ( 
-                <ChipDescription>            
+            {originLayerId === "binary_display" && ( 
+                <ChipDescription>
                     <LCDChipDisplay>
                         {parseInt( outputProcesseds.map(v => v ? '1' : '0').join('') , 2)}
                     </LCDChipDisplay>
                     <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
                 </ChipDescription>
             )}
-            {originLayerId !== 'binary_display' && (
+            {originLayerId !== "binary_display" && (
                 <ChipDescription>
-                    {name}
+                    <ChipDescriptionName>
+                        {name}
+                    </ChipDescriptionName>
                     <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
                 </ChipDescription>
             )}
@@ -314,7 +356,6 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                     top: `0px`,
                     left: `0px`,
                 }}
-                ref={dragRef}
                 onDoubleClick={setActiveLayer}
             >
                 <ChipInputBox>
@@ -326,8 +367,10 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                         />
                     ))}
                 </ChipInputBox>
-                <ChipDescription>
+                <ChipDescription ref={dragRef}>
+                    <ChipDescriptionName>
                         {name}
+                    </ChipDescriptionName>
                     <ChipDescriptionVersion>
                         version: {version}
                     </ChipDescriptionVersion>

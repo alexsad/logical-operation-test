@@ -7,11 +7,11 @@ import TrashElement from '../float-remove-btn/FloatRemoveBtn';
 import useChipLayer from '../stores/useChipLayer';
 
 const BasicInputOutputPoint = styled.div`
-    width: 50px;
-    height: 50px;
-    background-color: ${colors['gray.100']};
+    width: 45px;
+    height: 45px;
+    background-color: ${colors['blue.300']};
     border-radius: 50%;
-    border: 1px solid transparent;
+    border: 4px solid transparent;
     z-index: 2;
     position: relative;
 `;
@@ -21,12 +21,20 @@ const InputOutputPoint = styled(BasicInputOutputPoint)``;
 const OutputPointWrap = styled(InputOutputPoint)``;
 
 const InputPointAddBox = styled(BasicInputOutputPoint)`
-    background-color: ${colors['blue.100']};
+    background-color: ${colors['blue.300']};
     font-size: 2.4rem;
     color: white;
     text-align: center;
     cursor: pointer;
-`
+    padding:0;
+    padding-top: 0rem;
+
+    > label {
+        padding: 0;
+    }
+
+`;
+
 interface LabelProps {
     borderColor: string;
 }
@@ -34,51 +42,55 @@ interface LabelProps {
 const InputOutputLabel = styled.label<LabelProps>`
     width: 100px;
     height: 20px;
-    background-color: ${colors['gray.100']};
+    background-color: ${colors['blue.300']};
     color: white;
-    border-radius: .2rem;
     padding:.2rem;
     text-align: center;
     position: absolute;
-    top: 11px;
+    top: 9px;
     border: 1px solid ${({borderColor}) => borderColor};
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     > input[type=text] {
         color: white;
-        background-color: ${colors['gray.100']};
+        background-color: ${colors['blue.300']};
         border: 0px;
         width: calc(100% - .5rem);
         overflow: hidden;
     }
-    display: flex;
-    flex-direction: row;
-    align-items: center;
 `
 
 const InputLabel = styled(InputOutputLabel)<LabelProps>`
     left: 45px;
     border-left-color: transparent;
+    border-radius: 0 .2rem .2rem 0;
 `
 
 const OutputLabel = styled(InputOutputLabel)<LabelProps>`
     right: 45px;
     border-left-color: ${({borderColor}) => borderColor};
+    border-radius: .2rem 0 0 .2rem;
 `
 
 interface LabelSpinProps {
     bgColor: string;
+    active: boolean;
 }
 
 const InputLabelSpin = styled.div<LabelSpinProps>`
     width: 15px;
     height: 15px;
     background-color: ${({bgColor}) => bgColor};
+    filter:blur(${({active}) => active ? '2px' : '0px'}px);
     border-radius: 50%;
     margin-right: -20px;
+    border: 2px solid ${({bgColor}) => bgColor};
 `;
 
 const OutputLabelSpin = styled(InputLabelSpin)`
     margin-right: 0;
-    margin-left: -12px;
+    margin-left: -15px;
 `;
 
 const InnerInputLabel: React.FC<{defaultText: string, onChangeLabel: (newLabel: string) => void}> = ({defaultText, onChangeLabel}) => {
@@ -112,7 +124,9 @@ const InputPointAdd: React.FC = () => {
         }, 10);
     }
     return (
-        <InputPointAddBox onClick={addPoint}>+</InputPointAddBox>
+        <InputPointAddBox onClick={addPoint}>
+            <label>+</label>
+        </InputPointAddBox>
     );
 }
 
@@ -130,7 +144,9 @@ const OutputPointAdd: React.FC = () => {
         }, 10);
     }
     return (
-        <InputPointAddBox onClick={addPoint}>+</InputPointAddBox>
+        <InputPointAddBox onClick={addPoint}>
+            <label>+</label>
+        </InputPointAddBox>
     );
 }
 
@@ -157,9 +173,9 @@ const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
     const onChangeLabel = (newLabel: string) => {
         useChipLayer.getState().changeInputLabel(id, newLabel);
     }
-    const outBorderColor = isSelected ? colors['yellow.100'] : active ? colors['red.100'] : colors['gray.100'];
-    const innerBGColor = active ? colors['red.100'] : colors['gray.100'];
-    const innerSpinBGColor = active ? colors['red.100'] : colors['gray.10'];
+    const outBorderColor = isSelected ? colors['yellow.100'] : active ? colors['blue.300'] : colors['blue.300'];
+    const innerBGColor = active ? colors['blue.300'] : 'transparent';
+    const innerSpinBGColor = active ? colors['blue.200'] : colors['blue.300'];
     return (
         <InputOutputPoint
             onClick={setActiveInactive}
@@ -174,6 +190,7 @@ const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
                     id={id}
                     onClick={onSetInputPoint}
                     bgColor={innerSpinBGColor}
+                    active={active}
                 />
             </InputLabel>
             <TrashElement top={-1} right={-1} onClick={onRemovePoint}/>
@@ -206,9 +223,9 @@ const OutputPoint: React.FC<IInputOutputPoint> = ({id: outputPointId, active, la
     const onChangeLabel = (newLabel: string) => {
         useChipLayer.getState().changeOutputLabel(outputPointId, newLabel);
     }
-    const outBorderColor =  isActive ? colors['red.100'] : colors['gray.100'];
-    const innerBGColor = isActive ? colors['red.100'] : colors['gray.100'];
-    const innerSpinBGColor = isActive ? colors['red.100'] : colors['gray.10'];
+    const outBorderColor =  isActive ? colors['blue.300'] : colors['blue.300'];
+    const innerBGColor = isActive ? colors['blue.300'] : 'transparent';
+    const innerSpinBGColor = isActive ? colors['blue.200'] : colors['blue.300'];
     return (
         <OutputPointWrap
             style={{
@@ -221,6 +238,7 @@ const OutputPoint: React.FC<IInputOutputPoint> = ({id: outputPointId, active, la
                     id={outputPointId}
                     onClick={onConnectPoint}
                     bgColor={innerSpinBGColor}
+                    active={isActive}
                 />
                 <InnerInputLabel onChangeLabel={onChangeLabel} defaultText={label}/>
             </OutputLabel>

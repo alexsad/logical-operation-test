@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ToolSet from './tools/ToolSet';
 import ProjectProperties from './project-properties/ProjectProperties';
 import styled from 'styled-components';
-import buildBgEditor from './assets/bg-build.png';
+// import buildBgEditor from './assets/bg-build.png';
 import Chip from './chip/Chip';
 import LineTo from './line-to/LineTo';
 import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
@@ -44,18 +44,19 @@ const CenterPanel = styled.div`
     flex-direction: column;
     flex-grow: 1;
     overflow: hidden;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    background: rgb(1,106,234);
+    background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);  
+
 `
 
 const BoxStage = styled.div`
     flex-grow: 1;
     box-sizing: border-box;
-    background-image: url(${buildBgEditor});
-    background-color: ${colors['gray.10']};
     overflow: auto;
     position: relative;
     display: flex;
-    flex-direction: row;    
+    flex-direction: row;  
 `;
 
 const SubStageBox = styled.div`

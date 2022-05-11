@@ -8,6 +8,10 @@ const colors = {
     "blue.100": "#518a8a",
     "yellow.100": "#cbcb2f",
     "black.100": "#181818",
+    "blue.200":"#009eff",
+    "blue.300":"#0678e8",
+    "blue.400":"#09c6f9",
+    "white.100": "#00ffff",
 }
 
 
