@@ -8,7 +8,7 @@ import useChipLayer from '../stores/useChipLayer';
 import { debounce } from '../../util/debounce';
 
 const LayerOperationsWrap = styled.div`
-    background-color: #a00;
+    background-color: #ffffff38;
     width: 100%;
     padding: .5rem;
     display: flex;
@@ -66,7 +66,7 @@ const LayerOperations: React.FC = () => {
     const onPublish = async () => {
         const {publishLayer, getNewLayer, addLayer, setActiveLayerId} = useChipLayers.getState();
         const layer = useChipLayer.getState();
-        if(layer.name === '*' || layer.name.trim().length < 2){
+        if(layer.name.trim().length < 2){
             return;
         }
         await publishLayer(layer);
@@ -109,6 +109,7 @@ const LayerOperations: React.FC = () => {
             <LayerTitle>
                 {!!activeLayer && activeLayer?.version === 0 && (
                     <input
+                        placeholder="Input the chip name"
                         type="text"
                         defaultValue={activeLayer?.name}
                         onInput={debounce<React.ChangeEvent<HTMLInputElement>>(onChangeNameHandler, 500)}

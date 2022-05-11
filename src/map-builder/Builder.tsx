@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ToolSet from './tools/ToolSet';
 import ProjectProperties from './project-properties/ProjectProperties';
 import styled from 'styled-components';
-import buildBgEditor from './assets/bg-build.png';
+// import buildBgEditor from './assets/bg-build.png';
 import Chip from './chip/Chip';
 import LineTo from './line-to/LineTo';
 import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
@@ -10,13 +10,14 @@ import useChipLayer from './stores/useChipLayer';
 import { IChip } from '../interfaces/interfaces';
 import { Droppable, IDroppableEvent } from '../ui/Draggable';
 import LayerOperations from './layer-operations/LayerOperations';
+import colors from '../ui/colors';
 
 const BuilderWrap = styled.div`
     box-sizing: border-box;
     position: relative;
     width: 100%;
     height: 100vh;
-    background-color: #f0f0f0;
+    background-color: ${colors['gray.5']};
     display: flex;
     flex-flow: row no-wrap;
     overflow: hidden;
@@ -26,7 +27,7 @@ const Panel = styled.div`
     box-sizing: border-box;
     position: relative;
     height: 100vh;
-    background-color: #f0f0f0;
+    background-color: ${colors['gray.5']};
     display: flex;
     flex-flow: row no-wrap;
     flex-direction: column;
@@ -39,23 +40,23 @@ const CenterPanel = styled.div`
     box-sizing: border-box;
     position: relative;
     height: 100vh;
-    background-color: #f0f0f0;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     overflow: hidden;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    background: rgb(1,106,234);
+    background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);  
+
 `
 
 const BoxStage = styled.div`
     flex-grow: 1;
     box-sizing: border-box;
-    background-image: url(${buildBgEditor});
-    background-color: #999999;
     overflow: auto;
     position: relative;
     display: flex;
-    flex-direction: row;    
+    flex-direction: row;  
 `;
 
 const SubStageBox = styled.div`
@@ -71,7 +72,7 @@ const InputOutputBox = styled.div`
     height: 100%;
     padding: .5rem;
     box-sizing: border-box;
-    background-color: rgba(0,0,0,.5);
+    background-color: ${colors['gray.50']};
     display: flex;
     flex-direction: column;
     justify-content: space-between;

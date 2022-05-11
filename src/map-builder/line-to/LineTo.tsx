@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { IWire } from '../../interfaces/interfaces';
+import colors from '../../ui/colors';
 import { SimpleTrashElement } from '../float-remove-btn/FloatRemoveBtn';
 import useChipLayer from '../stores/useChipLayer';
 
@@ -8,12 +9,13 @@ const LineToWrap = styled.div`
     width: 1px;
     height: 100px;
     box-sizing: border-box;
-    background-color: #2d2d2d;
+    background-color: ${colors['blue.300']};
     position: absolute;
-    z-index: 1;
+    z-index: 0;
     border: .5px solid transparent;
     border-left-width: 0px;
     border-right-width: 0px;
+    border-radius: 4px;
 `;
 
 const LineToBox = styled.div`
@@ -42,10 +44,10 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
         const off1 = getOffset(fromElem);
         const off2 = getOffset(toElem);
         // bottom right
-        const x1 = off1.left + (off1.width / 2);
+        const x1 = off1.left + (off1.width / 1);
         const y1 = off1.top + (off1.height / 2);
         // top right
-        const x2 = off2.left + (off2.width / 2);
+        const x2 = off2.left + (off2.width / 5);
         const y2 = off2.top + (off2.height / 2);
         // distance
         const length = Math.sqrt(((x2-x1) * (x2-x1)) + ((y2-y1) * (y2-y1)));
@@ -110,7 +112,7 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
     return (
         <>
             <LineToWrap 
-                style={{backgroundColor: active ? '#a00' : '#2d2d2d', borderColor: isSelected ? 'yellow' : 'transparent'}}
+                style={{backgroundColor: active ? colors['blue.200'] : colors['blue.300'], borderColor: isSelected ? colors['yellow.100'] : 'transparent'}}
                 ref={elRef}
                 onClick={onClick}
             >

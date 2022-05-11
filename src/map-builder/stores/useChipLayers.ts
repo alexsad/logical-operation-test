@@ -63,7 +63,7 @@ export default create<ILayersContext>((set, get) => ({
         const nextId = `${nextUID()}`;
         return  {
             id: nextId,
-            name: '*',
+            name: '',
             version: 0,
             visible: true,
             inputs: [],
