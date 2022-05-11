@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import styled from 'styled-components';
-import pointCursorImg from './assets/cursor/point.png';
+import colors from './colors';
 import RingAudioCenter from './RingCenter';
 
 const CloseButton = styled.div`
@@ -44,23 +44,16 @@ const CloseLinkButton = styled(CloseButton)`
 export {CloseButton , CloseLinkButton};
 
 const ConfirmButton = styled.div`
-    background-color: #2c80a3;
-    border: 2px solid #140c1c;
+    background-color: ${colors['blue.300']};
+    border: 2px solid transparent;
     position: relative;
     border-radius: 5px;
     padding: .3rem;
     text-align: center;
     font-size: 1rem;
-    cursor: url(${pointCursorImg}) 10 0,auto;
+    cursor: pointer;
 
-    color: #f9f9f9;
-    text-stroke: 10px red;
-    text-shadow:
-        0px 0px 0 #000,
-        -1px -1px 0 #000, 
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
+    color: white;
 
     &:hover, &:active {
         background-color: #4c8ba5;
@@ -75,6 +68,7 @@ const ConfirmButton = styled.div`
         right: 0px;
         top: 0px;
         background-color: #ffffff21;
+        cursor: pointer;
     }
 `;
 

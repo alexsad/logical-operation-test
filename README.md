@@ -2,7 +2,7 @@
 
 if you need to understand how logical operators work, this platform is for you.
 
-you can use the online version [here](https://logical-operators-test.netlify.app/).
+you can see the online version [here](https://logical-operators-test.netlify.app/).
 
 
 ![alt text](https://logical-operators-test.netlify.app/assets/preview/project-example.jpg)

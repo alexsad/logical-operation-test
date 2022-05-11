@@ -37,7 +37,7 @@ const basicLayerFns = {
         }
         return [false];
     },
-    fn_binary_display: (...args: boolean[]) => {
+    fn_decimal_display: (...args: boolean[]) => {
         return args;
     },
 }
