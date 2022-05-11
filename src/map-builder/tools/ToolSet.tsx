@@ -4,6 +4,7 @@ import { IChip } from '../../interfaces/interfaces';
 import TabContainer from '../TabContainer';
 import { ChipPreview } from '../chip/Chip';
 import useChipLayers from '../stores/useChipLayers';
+import colors from '../../ui/colors';
 
 const ToolSetWrap = styled.div`
     display: flex;
@@ -32,13 +33,18 @@ const ToolSetWrap = styled.div`
         // border: 1px solid red;
         overflow-y: auto;
         height: 100%;
+        background: rgb(1,106,234);
+        background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);         
 
         > * {
+            padding: .5rem;
             margin: 5px;
+            border:2px solid transparent;
+            border-radius: .5rem;
         }
 
         > :hover{
-            background-color: #4d4d4ddd;
+            border:2px solid ${colors['blue.200']};
         }
 
         > .is-selected{

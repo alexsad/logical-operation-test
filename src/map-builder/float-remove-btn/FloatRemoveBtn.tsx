@@ -12,6 +12,7 @@ const SimpleTrashElement = styled.div`
     background-position: center center;
     border-radius: 50%;
     cursor: pointer;
+    z-index: 3;
 `;
 
 const TrashTransparentBox = styled.div`
