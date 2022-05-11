@@ -17,23 +17,24 @@ const BuilderWrap = styled.div`
     position: relative;
     width: 100%;
     height: 100vh;
-    background-color: ${colors['gray.5']};
     display: flex;
     flex-flow: row no-wrap;
     overflow: hidden;
+    background: rgb(1,106,234);
+    background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);  
 `;
 
 const Panel = styled.div`
     box-sizing: border-box;
     position: relative;
     height: 100vh;
-    background-color: ${colors['gray.5']};
+    background-color: transparent;
     display: flex;
     flex-flow: row no-wrap;
     flex-direction: column;
     overflow: hidden;
     width: 275px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 `
 
 const CenterPanel = styled.div`
@@ -45,9 +46,6 @@ const CenterPanel = styled.div`
     flex-grow: 1;
     overflow: hidden;
     box-sizing: border-box;
-    background: rgb(1,106,234);
-    background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);  
-
 `
 
 const BoxStage = styled.div`

@@ -1,31 +1,31 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import colors from '../ui/colors';
 
 const ContainerWrap = styled.div`
     width: 100%;
     box-sizing: border-box;
-    background-color: #f0f0f0;
+    background-color: transparent;
     padding: 0.1rem;
 `;
 
 const Container = styled.div`
     box-sizing: border-box;
-    border: 2px solid #2f2f2f;
-    background-color: #f0f0f0;
+    border: 2px solid rgba(255,255,255,.1);
+    background-color: transparent;
 `;
 
 const Title = styled.div`
-    background-color: #2f2f2f;
-    color: rgb(226, 225, 225);
+    background-color: rgba(255,255,255,.2);
+    color: white;
     text-align: left;
-    font-size: 14px;
+    font-size: 1rem;
     padding: .2rem;
 `;
 
 const TabContainer = styled.div`
-    color: rgb(226, 225, 225);
+    color: white;
     text-align: left;
-    font-size: 14px;
     padding: .3rem;
     display: flex;
     flex-flow: column;
@@ -33,16 +33,16 @@ const TabContainer = styled.div`
 `;
 
 const TabTitle = styled.div`
-    background-color: #fff;
-    color: rgb(78,78,78);
+    background-color: rgba(255,255,255,.2);
+    color: white;
     text-align: left;
-    font-size: 12px;
+    font-size: .9rem;
     padding: .3rem;
     width: auto;
 `;
 
 const SubContainer = styled.div`
-    background-color: #fff;
+    background-color: rgba(255,255,255,.2);
     padding: .3rem;
     width: calc(100% - .6rem);
 `;

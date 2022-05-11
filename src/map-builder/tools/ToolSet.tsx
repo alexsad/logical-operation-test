@@ -11,45 +11,35 @@ const ToolSetWrap = styled.div`
     flex-direction: column;
     width: 100%;
     // border: 1px solid blue;
-    height: calc(100vh - 16rem);
+    height: calc(100vh - 19.2rem);
+`;
 
-    > .tool-set-options{
-        width: 100%;
-        background-color: #fff;
-        padding: 0.6rem;
-        box-sizing: border-box;
-        color: #000;
+const ToolSetBox = styled.div`
+    width: 100%;
+    flex-grow: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,.1);
+    // border: 1px solid red;
+    overflow-y: auto;
+    height: 100%;
+
+    > * {
+        padding: .5rem;
+        margin: 5px;
+        border:2px solid transparent;
+        border-radius: .5rem;
     }
 
-    > .tool-set-box{
-        width: 100%;
-        flex-grow: 1;
-        box-sizing: border-box;
-        display: flex;
-        flex-flow: row wrap;
-        align-items: center;
-        justify-content: center;
-        background-color: lightgrey;
-        // border: 1px solid red;
-        overflow-y: auto;
-        height: 100%;
-        background: rgb(1,106,234);
-        background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);         
+    > :hover{
+        border:2px solid ${colors['blue.200']};
+    }
 
-        > * {
-            padding: .5rem;
-            margin: 5px;
-            border:2px solid transparent;
-            border-radius: .5rem;
-        }
-
-        > :hover{
-            border:2px solid ${colors['blue.200']};
-        }
-
-        > .is-selected{
-            background-color: #ebff99;
-        }
+    > .is-selected{
+        background-color: #ebff99;
     }
 `;
 
@@ -128,8 +118,8 @@ const ToolSet: React.FC = () => {
             instInputDeps:[],
         },
         {
-            id: 'binary_display',
-            name: 'binary_display',
+            id: 'decimal_display',
+            name: 'decimal_display',
             version: 1,
             inputs: [
                 {
@@ -176,7 +166,7 @@ const ToolSet: React.FC = () => {
                 },
             ],
             position: { x: 0, y: 0},
-            originLayerId: 'binary_display',
+            originLayerId: 'decimal_display',
             instInputDeps:[],
         },
         ...publishedLayer,
@@ -185,9 +175,9 @@ const ToolSet: React.FC = () => {
     return (
         <TabContainer title="Tools" tabTitle="Chips">
             <ToolSetWrap>
-                <div className="tool-set-box">
+                <ToolSetBox>
                     {chips.map(chip => <ChipPreview key={chip.id} {...chip}/>)}
-                </div>
+                </ToolSetBox>
             </ToolSetWrap>
         </TabContainer>
     );

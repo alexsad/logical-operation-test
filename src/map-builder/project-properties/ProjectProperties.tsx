@@ -5,36 +5,34 @@ import TabContainer from '../TabContainer';
 import useChipLayers from '../stores/useChipLayers';
 import useChipLayer from '../stores/useChipLayer';
 import { IChipLayer } from '../../interfaces/interfaces';
+import colors from '../../ui/colors';
+import { ConfirmButton } from '../../ui/buttons';
 
-const ProjectPropertiesWrap = styled.div`
-    > .properties-input > label{
-        width: 99%;
-        text-align: left;
-        font-size: 12px;
+const ProjectPropertiesWrap = styled.div``;
+
+const PropertyInputs = styled.div``;
+
+const Row = styled.div`
+    width: 97%;
+    text-align: left;
+    font-size: 1rem;
+    float: left;
+    padding: 4px;
+    color: white;
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+
+    > input {
         float: left;
-        padding: 4px;
-        color: rgb(78, 78, 78);
-
-        > .row {
-            width: 100%;
-            margin-top: 5px;
-
-            > input {
-                float: left;
-                &[type=text]{
-                    width: 15%;
-                }
-                &[type=checkbox]{
-                    display: block;
-                    width: 95%;
-                }
-                &[type=range]{
-                    width: 75%;
-                    margin-top: 0px;
-                    margin-left: 2%;
-                }
-            }
-        }
+        color: white;
+        width: 98%;
+        background-color: ${colors['blue.300']};
+        border: 0px solid transparent;
+        border-radius: 3px;
+        height: 28px;
+        font-size: 1rem;
+        margin-top:.2rem;
     }
 `;
 
@@ -105,22 +103,30 @@ const ProjectProperties: React.FC =  () => {
     return (
         <TabContainer title="Project" tabTitle="Configurations">
             <ProjectPropertiesWrap>
-                <div className="properties-input">
-                    <label>
+                <PropertyInputs>
+                    <Row>
                         Project name:
-                        <div className="row">
-                        <input style={{width:'90%'}} type="text" value={projectName} maxLength={40} onChange={updateProjectName} />
-                        </div>
-                    </label>
-                    <label>
-                        <input alt="" onChange={uploadFileHandler} type="file"/>
-                    </label>                    
-                    <label>
-                        <button onClick={downloadProject}>
+                        <input type="text" value={projectName} maxLength={40} onChange={updateProjectName} />
+                    </Row>
+                    <Row>
+                        <ConfirmButton>
+                            import project
+                            <input style={{
+                                position: "absolute",
+                                left:0,
+                                right:0,
+                                top:0,
+                                bottom:0,
+                                opacity:0,
+                            }} alt="" onChange={uploadFileHandler} type="file"/>
+                        </ConfirmButton>
+                    </Row>
+                    <Row>
+                        <ConfirmButton onClick={downloadProject}>
                             download project
-                        </button>
-                    </label>
-                </div>
+                        </ConfirmButton>
+                    </Row>
+                </PropertyInputs>
             </ProjectPropertiesWrap>
         </TabContainer>
     );
