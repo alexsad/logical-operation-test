@@ -7,6 +7,7 @@ import useChipLayer from '../stores/useChipLayer';
 import { IChipLayer } from '../../interfaces/interfaces';
 import colors from '../../ui/colors';
 import { ConfirmButton } from '../../ui/buttons';
+import useResolution from '../stores/useResolution';
 
 const ProjectPropertiesWrap = styled.div``;
 
@@ -43,6 +44,7 @@ interface IProjectStructure {
 
 const ProjectProperties: React.FC =  () => {
     const [projectName, setProjectName] = useState('my-project');
+    const resolution = useResolution(state => state.resolution);
 
     const updateProjectName = ({target}:React.ChangeEvent<HTMLInputElement>) => {
         setProjectName(target.value);
@@ -52,7 +54,7 @@ const ProjectProperties: React.FC =  () => {
         const layers = useChipLayers.getState().layers;
         const projectStructure: IProjectStructure = {
             layers,
-            projectName: projectName,
+            projectName,
         }
         const projectStr = JSON.stringify(projectStructure);
         const element = document.createElement("a");
@@ -66,7 +68,8 @@ const ProjectProperties: React.FC =  () => {
     const uploadFileHandler = ({target}:React.ChangeEvent<HTMLInputElement>) => {
 		if(!window["FileReader"]){
 			return;
-		} 
+		}
+        const {addLayers} = useChipLayers.getState(); 
 		let reader = new FileReader();
 
 		reader.onload = function (evt:any) {
@@ -79,26 +82,22 @@ const ProjectProperties: React.FC =  () => {
 			}
             const {projectName, layers} = JSON.parse(evt.target.result) as IProjectStructure;
             setProjectName(projectName)
-
-            useChipLayers.getState().setActiveLayerId('');
-            useChipLayers.getState().setLayers(layers);
-            if(!!layers.length){
-                const lastLayer = layers[layers.length-1];
-                useChipLayers.getState().setActiveLayerId(lastLayer.id);
-                useChipLayer.getState().updateLayer(lastLayer);
-            }
+            addLayers(layers);
         };
 		reader.readAsText((target as unknown as {files:Blob[]}).files[0]);
     }
 
     useEffect(() => {
-        const {updateLayer} = useChipLayer.getState();
-        const {addLayer, setActiveLayerId, getNewLayer} = useChipLayers.getState();
-        const newLayer =  getNewLayer();
-        updateLayer({...newLayer});
-        addLayer({...newLayer});
-        setActiveLayerId(newLayer.id);
-    },[]);
+        if(resolution.height > 0){
+            const {updateLayer} = useChipLayer.getState();
+            const {addLayer, setActiveLayerId, getNewLayer} = useChipLayers.getState();
+            const newLayer =  getNewLayer();
+            newLayer.resolution = {...resolution};
+            updateLayer({...newLayer});
+            addLayer({...newLayer});
+            setActiveLayerId(newLayer.id);
+        }
+    },[resolution]);
 
     return (
         <TabContainer title="Project" tabTitle="Configurations">
@@ -111,14 +110,19 @@ const ProjectProperties: React.FC =  () => {
                     <Row>
                         <ConfirmButton>
                             import project
-                            <input style={{
-                                position: "absolute",
-                                left:0,
-                                right:0,
-                                top:0,
-                                bottom:0,
-                                opacity:0,
-                            }} alt="" onChange={uploadFileHandler} type="file"/>
+                            <input 
+                                style={{
+                                    position: "absolute",
+                                    left:0,
+                                    right:0,
+                                    top:0,
+                                    bottom:0,
+                                    opacity:0,
+                                }}
+                                alt=""
+                                onChange={uploadFileHandler}
+                                type="file"
+                            />
                         </ConfirmButton>
                     </Row>
                     <Row>

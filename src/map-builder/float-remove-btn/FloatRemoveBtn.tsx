@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import colors from '../../ui/colors';
 import trashIcon from '../assets/trash-10-16.png';
 
 const SimpleTrashElement = styled.div`
     position: absolute;
     width: 2rem;
     height: 2rem;
-    background-color: black;
+    background-color: ${colors['red.100']};
     background-image: url(${trashIcon});
     background-repeat: no-repeat;
     background-position: center center;
@@ -17,8 +18,10 @@ const SimpleTrashElement = styled.div`
 
 const TrashTransparentBox = styled.div`
     position: absolute;
-    width: 100%;
-    height: 100%;
+    left: 0;
+    right: 0;
+    top:0;
+    bottom:0;
 `;
 
 const TrashElement: React.FC<{
@@ -28,7 +31,7 @@ const TrashElement: React.FC<{
     right?: number,
 }> = ({onClick, top, left, right}) => {
     const [parentRef, setParentRef] = useState(null as null | HTMLDivElement);
-    const [isMouseOver, setIsMouseOver] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const style = {
         top: `${top}rem`,
         opacity: 1,
@@ -41,48 +44,46 @@ const TrashElement: React.FC<{
     }
 
     useEffect(() => {
-        const mouseLeave = () => {
-            setIsMouseOver(false);
-        }
-        const mouseOver = () => {
-            setIsMouseOver(true);
+        const onClickParent = () => {
+            setIsVisible(oldState => !oldState);
         }
         if(parentRef){
-            parentRef.addEventListener('mouseleave', mouseLeave);
-            parentRef.addEventListener('mouseover', mouseOver);
+            parentRef.addEventListener('click', onClickParent);
         }
         return () => {
             if(parentRef){
-                parentRef.removeEventListener('mouseleave', mouseLeave);
-                parentRef.removeEventListener('mouseover', mouseOver);
+                parentRef.removeEventListener('click', onClickParent);
             }
         }
     }, [parentRef]);
 
-    const onMouseOver = (event: React.MouseEvent<HTMLElement>  ) => {
+    const onClickHandle = (event: React.MouseEvent<HTMLElement>) => {
         if(!!parentRef){
-            setIsMouseOver(true);
+            setIsVisible(!isVisible);
             return;
         }
         const target = event.target as HTMLDivElement;
         if(target.parentElement){
             setParentRef(target.parentElement as HTMLDivElement);
         }
-        setIsMouseOver(true);
+        setIsVisible(!isVisible);
     }
 
-    if(isMouseOver){
+    if(isVisible || parentRef){
         return (
             <SimpleTrashElement
-                onClick={onClick}
+                onClick={evt => {
+                    evt.preventDefault();
+                    evt.stopPropagation();
+                    onClick();
+                }}
                 style={style}
-                onMouseLeave={() => setIsMouseOver(false)}
             />
         );
     }
     return (
         <TrashTransparentBox
-            onMouseOver={onMouseOver}
+            onClick={onClickHandle}
         />
     )
 }

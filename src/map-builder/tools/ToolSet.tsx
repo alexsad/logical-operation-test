@@ -25,6 +25,7 @@ const ToolSetBox = styled.div`
     background-color: rgba(0,0,0,.1);
     // border: 1px solid red;
     overflow-y: auto;
+    overflow-x: hidden;
     height: 100%;
 
     > * {
