@@ -5,11 +5,16 @@ import Sign from './sign/Sign';
 import GlobalStyle from './GlobalStyle';
 import LoadingScreen from './pages/LoadingScreen';
 
-const GameFrame = styled.div`
-  background-color: #444444;
+const AppFrame = styled.div`
+  background-color: #121212;
   font-family: font-family: 'Signika', sans-serif;
   font-size: 1rem;
-
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   * {
 
     /* width */
@@ -71,14 +76,14 @@ function App() {
               <React.Suspense fallback={<LoadingScreen/>}>
                 <Router>
                   <Switch>
-                    <GameFrame>
+                    <AppFrame>
                         <Sign>                  
                         <Route path="/" exact={true} component={Builder} />
                           <Route path="/circ-builder" render={
                           () => <Builder/>
                         } />
                       </Sign>
-                    </GameFrame>
+                    </AppFrame>
                   </Switch>
                 </Router>
               </React.Suspense>

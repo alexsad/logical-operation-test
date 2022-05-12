@@ -32,23 +32,24 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
     const getOffset = ( el: HTMLElement ) => {
         var rect = el.getBoundingClientRect();
         return {
-            left: rect.left + window.pageXOffset-345,
-            top: rect.top + window.pageYOffset-54,
+            left: rect.left + window.pageXOffset,
+            top: rect.top + window.pageYOffset,
             width: rect.width || el.offsetWidth,
             height: rect.height || el.offsetHeight
         };
     }
 
-    const adjustLine = useCallback((fromElem: HTMLElement, toElem: HTMLElement, line: HTMLElement) => {
+    const adjustLine = useCallback((fromElem: HTMLElement, toElem: HTMLElement, line: HTMLElement, boxParent: HTMLElement) => {
+        const boxParentRect = boxParent.getBoundingClientRect(); 
         const thickness = 4;
         const off1 = getOffset(fromElem);
         const off2 = getOffset(toElem);
         // bottom right
-        const x1 = off1.left + (off1.width / 1);
-        const y1 = off1.top + (off1.height / 2);
+        const x1 = off1.left + (off1.width / 1) + (boxParent.scrollLeft - boxParentRect.left - 70);
+        const y1 = off1.top + (off1.height / 2) + (boxParent.scrollTop - boxParentRect.top);
         // top right
-        const x2 = off2.left + (off2.width / 5);
-        const y2 = off2.top + (off2.height / 2);
+        const x2 = off2.left + (off2.width / 5) + (boxParent.scrollLeft - boxParentRect.left - 70);
+        const y2 = off2.top + (off2.height / 2) + (boxParent.scrollTop - boxParentRect.top);
         // distance
         const length = Math.sqrt(((x2-x1) * (x2-x1)) + ((y2-y1) * (y2-y1)));
         // center
@@ -72,11 +73,14 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
         const line = elRef.current;
         const fromElem = document.getElementById(chipOutputId);
         const toElem =  document.getElementById(chipInputId);
-        if(!!line && !!fromElem && !!toElem){
+        const boxParent = document.getElementById('center_panel_box');
+
+        if(!!line && !!fromElem && !!toElem && !!boxParent){
             const {x,y} = adjustLine(
                 fromElem, 
                 toElem,
-                line
+                line,
+                boxParent,
             );
 
             const helper = helperElRef.current;
@@ -85,9 +89,6 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
                 helper.style.left = `${x}px`;
             }
         }
-
-
-
     }, [chipInputId, chipOutputId, adjustLine]);
 
     useEffect(() => {

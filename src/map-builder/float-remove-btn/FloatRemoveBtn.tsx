@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import colors from '../../ui/colors';
 import trashIcon from '../assets/trash-10-16.png';
 
 const SimpleTrashElement = styled.div`
     position: absolute;
     width: 2rem;
     height: 2rem;
-    background-color: black;
+    background-color: ${colors['red.100']};
     background-image: url(${trashIcon});
     background-repeat: no-repeat;
     background-position: center center;
@@ -17,8 +18,10 @@ const SimpleTrashElement = styled.div`
 
 const TrashTransparentBox = styled.div`
     position: absolute;
-    width: 100%;
-    height: 100%;
+    left: 0;
+    right: 0;
+    top:0;
+    bottom:0;
 `;
 
 const TrashElement: React.FC<{
@@ -50,6 +53,7 @@ const TrashElement: React.FC<{
         if(parentRef){
             parentRef.addEventListener('mouseleave', mouseLeave);
             parentRef.addEventListener('mouseover', mouseOver);
+
         }
         return () => {
             if(parentRef){

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import colors from '../ui/colors';
 
 const ContainerWrap = styled.div`
     width: 100%;
