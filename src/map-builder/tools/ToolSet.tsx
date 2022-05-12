@@ -121,7 +121,7 @@ const ToolSet: React.FC = () => {
         {
             id: 'decimal_display',
             name: 'decimal_display',
-            version: 1,
+            version: 2,
             inputs: [
                 {
                     id: 'in_1',

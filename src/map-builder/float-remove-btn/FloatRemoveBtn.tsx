@@ -44,8 +44,13 @@ const TrashElement: React.FC<{
     }
 
     useEffect(() => {
-        const onClickParent = () => {
-            setIsVisible(oldState => !oldState);
+        const onClickParent = (evt: MouseEvent) => {
+            const target = evt.target as HTMLElement;
+            if(isVisible && !!target && target.getAttribute('data-trash-item')){
+                onClick();
+            }else{
+                setIsVisible(oldState => !oldState);
+            }
         }
         if(parentRef){
             parentRef.addEventListener('click', onClickParent);
@@ -55,21 +60,21 @@ const TrashElement: React.FC<{
                 parentRef.removeEventListener('click', onClickParent);
             }
         }
-    }, [parentRef]);
+    }, [parentRef, isVisible, onClick]);
 
     const onClickHandle = (event: React.MouseEvent<HTMLElement>) => {
         if(!!parentRef){
-            setIsVisible(!isVisible);
+            setIsVisible(oldState => !oldState);
             return;
         }
         const target = event.target as HTMLDivElement;
         if(target.parentElement){
             setParentRef(target.parentElement as HTMLDivElement);
         }
-        setIsVisible(!isVisible);
+        setIsVisible(oldState => !oldState);
     }
 
-    if(isVisible || parentRef){
+    if(isVisible){
         return (
             <SimpleTrashElement
                 onClick={evt => {
@@ -78,6 +83,7 @@ const TrashElement: React.FC<{
                     onClick();
                 }}
                 style={style}
+                data-trash-item="trash-element"
             />
         );
     }

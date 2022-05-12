@@ -7,6 +7,8 @@ import arrowLeftIcon from '../assets/arrow-left-white.png';
 import useChipLayer from '../stores/useChipLayer';
 import { debounce } from '../../util/debounce';
 import useResolution from '../stores/useResolution';
+import fullScreen from '../assets/fullscreen.png';
+import colors from '../../ui/colors';
 
 const LayerOperationsWrap = styled.div`
     background-color: #ffffff38;
@@ -27,6 +29,13 @@ const LayerTitle = styled.div`
         border-color: transparent;
         height: 2rem;
         font-size: 2rem;
+    }
+    > input[type=text] {
+        width: 100%;
+        &::placeholder {
+            color: ${colors['blue.200']};
+            opacity: 1;
+        }
     }
 `;
 
@@ -50,6 +59,11 @@ const SaveBtn = styled(btn)`
 
 const RollbackBtn = styled(btn)`
     background-image: url(${arrowLeftIcon});
+    background-size: 16px 16px;
+`;
+
+const AdjustScreenBtn = styled(btn)`
+    background-image: url(${fullScreen});
     background-size: 16px 16px;
 `;
 
@@ -104,6 +118,16 @@ const LayerOperations: React.FC = () => {
         }
     }
 
+    const adjustResolution = () => {
+        const {resolution} = useResolution.getState();
+        const {updateLayer, getLayer} = useChipLayer.getState();
+        const {updateLayer: updateLayerInLayers} = useChipLayers.getState();
+        const layer = getLayer();
+        layer.resolution = {...resolution};
+        updateLayer(layer);
+        updateLayerInLayers(layer);
+    }
+
     return (
         <LayerOperationsWrap>
             {!!activeLayer && activeLayer.version > 0 && (
@@ -123,6 +147,7 @@ const LayerOperations: React.FC = () => {
                     <label>{activeLayer.name}-{activeLayer.version}</label>
                 )}
             </LayerTitle>
+            <AdjustScreenBtn onClick={adjustResolution}/>
             {!!activeLayer && activeLayer?.version > 0 && (
                 <>
                     <SaveBtn onClick={() => onRepublish(activeLayer.id)}/>

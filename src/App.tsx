@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Sign from './sign/Sign';
 import GlobalStyle from './GlobalStyle';
 import LoadingScreen from './pages/LoadingScreen';
+import colors from './ui/colors';
 
 const AppFrame = styled.div`
   background-color: #121212;
@@ -19,7 +20,7 @@ const AppFrame = styled.div`
 
     /* width */
     ::-webkit-scrollbar {
-        width: 15px;
+        width: 5px;
     }
   
     /* Track */
@@ -33,20 +34,20 @@ const AppFrame = styled.div`
   
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background: #9e9e9e; 
+        background: ${colors['blue.200']}; 
         border-radius: 6px;
     }
   
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-        background: #868686; 
+        background: ${colors['blue.300']}; 
     }
 
   }
 
   /* Works on Firefox */
   * {
-      scrollbar-width: 15px;
+      scrollbar-width: 5px;
       scrollbar-color: #080705 rgba(50,50,50,.2);
   }
 
