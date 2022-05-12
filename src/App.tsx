@@ -4,17 +4,23 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Sign from './sign/Sign';
 import GlobalStyle from './GlobalStyle';
 import LoadingScreen from './pages/LoadingScreen';
+import colors from './ui/colors';
 
-const GameFrame = styled.div`
-  background-color: #444444;
+const AppFrame = styled.div`
+  background-color: #121212;
   font-family: font-family: 'Signika', sans-serif;
   font-size: 1rem;
-
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   * {
 
     /* width */
     ::-webkit-scrollbar {
-        width: 15px;
+        width: 5px;
     }
   
     /* Track */
@@ -28,20 +34,20 @@ const GameFrame = styled.div`
   
     /* Handle */
     ::-webkit-scrollbar-thumb {
-        background: #9e9e9e; 
+        background: ${colors['blue.200']}; 
         border-radius: 6px;
     }
   
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-        background: #868686; 
+        background: ${colors['blue.300']}; 
     }
 
   }
 
   /* Works on Firefox */
   * {
-      scrollbar-width: 15px;
+      scrollbar-width: 5px;
       scrollbar-color: #080705 rgba(50,50,50,.2);
   }
 
@@ -71,14 +77,14 @@ function App() {
               <React.Suspense fallback={<LoadingScreen/>}>
                 <Router>
                   <Switch>
-                    <GameFrame>
+                    <AppFrame>
                         <Sign>                  
                         <Route path="/" exact={true} component={Builder} />
                           <Route path="/circ-builder" render={
                           () => <Builder/>
                         } />
                       </Sign>
-                    </GameFrame>
+                    </AppFrame>
                   </Switch>
                 </Router>
               </React.Suspense>

@@ -1,5 +1,5 @@
 import create from 'zustand';
-import { IChip, IChipLayer, IInputOutputPoint } from '../../interfaces/interfaces';
+import { IChip, IChipLayer, IInputOutputPoint, Resolution } from '../../interfaces/interfaces';
 import { nextUID } from '../../util/uuid';
 
 interface ILayersContext extends IChipLayer{
@@ -21,8 +21,8 @@ interface ILayersContext extends IChipLayer{
     removeInput: (idInput: string) => void;
     changeInputLabel: (pointId: string, label: string) => void;
     changeOutputLabel: (pointId: string, label: string) => void;
+    setResolution: (resolution: Resolution) => void;
 }
-
 
 const firstLayerId =  `${nextUID()}`;
 
@@ -36,6 +36,10 @@ export default create<ILayersContext>((set, get) => ({
     outputs: [],
     chips: [],
     wires: [],
+    resolution: {
+        width: 0,
+        height: 0,
+    },
     getLayer: () => {
         const {
             id,
@@ -46,6 +50,7 @@ export default create<ILayersContext>((set, get) => ({
             outputs, 
             chips, 
             wires,
+            resolution,
         } = get();
         return {
             id,
@@ -56,7 +61,13 @@ export default create<ILayersContext>((set, get) => ({
             outputs,
             chips,
             wires,
+            resolution,
         };
+    },
+    setResolution: (resolution: Resolution) => {
+        set({
+            resolution,
+        })
     },
     removeOutput: (idOutput: string) => {
         const {outputs, wires, removeWire} = get();
@@ -197,8 +208,8 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     addInpuPoint: (point: IInputOutputPoint) => {
-        const {inputs, id: layerId} = get();
-        const newId = `${layerId}_inp_point_${nextUID()}`;
+        const {inputs} = get();
+        const newId = `in_point_${nextUID()}`;
         inputs.push({
             ...point,
             id: newId,
@@ -208,8 +219,8 @@ export default create<ILayersContext>((set, get) => ({
         });
     },
     addOutPoint: (point: IInputOutputPoint) => {
-        const {outputs, id: layerId} = get();
-        const newId = `${layerId}_out_point_${nextUID()}`;
+        const {outputs} = get(); 
+        const newId = `out_point_${nextUID()}`;
         outputs.push({
             ...point,
             id: newId,

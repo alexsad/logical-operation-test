@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { IChip } from '../../interfaces/interfaces';
 import colors from '../../ui/colors';
@@ -15,7 +15,6 @@ const ChipWrapper = styled.div`
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    cursor:move;
     z-index: 2;
     position: relative;
     align-items: stretch;
@@ -33,18 +32,22 @@ const ChipDescription = styled.div`
     border-radius: .2rem;
     border: 2px solid ${colors['blue.300']};
     z-index: 2;
+    cursor:move;
+    position: relative;
 `;
 
 const ChipDescriptionName = styled.label`
     width: 100%;
     font-size: .8rem;
     overflow: hidden;
+    cursor:move;
 `;
 
 const ChipDescriptionVersion = styled.label`
     width: 100%;
     font-size: .5rem;
     overflow: hidden;
+    cursor:move;
 `;
 
 const ChipInputBox = styled.div`
@@ -147,7 +150,24 @@ const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: stri
     );
 }
 
-const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, originLayerId}) => {
+const LCDDisplay: React.FC<{inputs: boolean[]}> = ({inputs}) => {
+    const [firstInput, ...others] = inputs;
+    if(firstInput){
+        const decimalResult = parseInt(others.map(v => v ? '1' : '0').join('') , 2);
+        return (
+            <LCDChipDisplay>
+                -{8 - decimalResult}
+            </LCDChipDisplay>
+        );
+    }
+    return (
+        <LCDChipDisplay>
+            {parseInt( inputs.map(v => v ? '1' : '0').join('') , 2)}
+        </LCDChipDisplay>
+    );
+}
+
+const ChipEndurence: React.FC<IChip & {chipRef: React.RefObject<HTMLDivElement>}> = ({id, name, version, inputs, outputs, originLayerId, chipRef}) => {
     const customInputs = [...inputs];
     const customOutputs = [...outputs];
     const wires = useChipLayer(state => state.wires);
@@ -194,7 +214,6 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
 
     return (
         <ChipEndurenceWrap>
-            <TrashElement onClick={onRemoveChip} top={-1.8} right={1.5}/>
             <ChipInputBox>
                 {customInputs.map((input) => (
                     <ChipInput 
@@ -205,15 +224,15 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
                 ))}
             </ChipInputBox>
             {originLayerId === "decimal_display" && ( 
-                <ChipDescription>
-                    <LCDChipDisplay>
-                        {parseInt( outputProcesseds.map(v => v ? '1' : '0').join('') , 2)}
-                    </LCDChipDisplay>
+                <ChipDescription ref={chipRef}>
+                    <TrashElement onClick={onRemoveChip} top={-1.8} right={1.5}/>
+                    <LCDDisplay inputs={outputProcesseds}/>
                     <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
                 </ChipDescription>
             )}
             {originLayerId !== "decimal_display" && (
-                <ChipDescription>
+                <ChipDescription ref={chipRef}>
+                    <TrashElement onClick={onRemoveChip} top={-1.8} right={1.5}/>
                     <ChipDescriptionName>
                         {name}
                     </ChipDescriptionName>
@@ -240,55 +259,80 @@ const ChipEndurence: React.FC<IChip> = ({id, name, version, inputs, outputs, ori
 
 const Chip: React.FC<IChip> = (chip) => {
     const {position} = chip;
-    let newPosX = 0, newPosY = 0, startPosX = 0, startPosY = 0;
+    
     const elRef = useRef<HTMLDivElement>(null);
+    const chipRef = useRef<HTMLDivElement>(null);
 
-    function mouseMove(e: MouseEvent) {
-        // calculate the new position
-        newPosX = startPosX - e.clientX;
-        newPosY = startPosY - e.clientY;
-    
-        // with each move we also want to update the start X and Y
-        startPosX = e.clientX;
-        startPosY = e.clientY;
+    useEffect(() => {
+        let newPosX = 0, 
+            newPosY = 0,
+            startPosX = 0,
+            startPosY = 0;
 
-        const el = elRef.current;
-        if(el){
-            // set the element's new position:
-            el.style.top = (el.offsetTop - newPosY) + "px";
-            el.style.left = (el.offsetLeft - newPosX) + "px";
-        }
-        globalThis.dispatchEvent(
-            new CustomEvent('chip:move', {})
-        );
-    }
-    const onMouseOverHandler = (evt: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        evt.preventDefault();
-    
-        // get the starting position of the cursor
-        startPosX = evt.clientX;
-        startPosY = evt.clientY;
+        function mouseMove(e: MouseEvent) {
+            const x = e.clientX ;
+            const y = e.clientY ;
+            // calculate the new position
+            newPosX = startPosX - x;
+            newPosY = startPosY - y;
         
-        document.addEventListener("mousemove", mouseMove);
-
-        const mouseUpHandler = function(){
-            document.removeEventListener("mousemove", mouseMove);
+            // with each move we also want to update the start X and Y
+            startPosX = x;
+            startPosY = y;
+    
             const el = elRef.current;
             if(el){
                 // set the element's new position:
-                useChipLayer.getState().moveChip({
-                    ...chip,
-                    position: {
-                        x: (el.offsetLeft - newPosX),
-                        y: (el.offsetTop - newPosY),
-                    },
-                });
+                el.style.top = (el.offsetTop - newPosY) + "px";
+                el.style.left = (el.offsetLeft - newPosX) + "px";
             }
-            document.removeEventListener("mouseup", mouseUpHandler);
+            globalThis.dispatchEvent(
+                new CustomEvent('chip:move', {})
+            );
         }
+
+        const onMouseOverHandler = (evt: MouseEvent) => {
+            // event.preventDefault();
+
+            // const evt = event as React.MouseEvent<HTMLDivElement, MouseEvent>;
+            
+            evt.preventDefault();
         
-        document.addEventListener("mouseup", mouseUpHandler);
-    }
+            // get the starting position of the cursor
+            startPosX = evt.clientX;
+            startPosY = evt.clientY;
+            
+            document.addEventListener("mousemove", mouseMove);
+    
+            const mouseUpHandler = function(){
+                document.removeEventListener("mousemove", mouseMove);
+                const el = elRef.current;
+                if(el){
+                    // set the element's new position:
+                    useChipLayer.getState().moveChip({
+                        ...chip,
+                        position: {
+                            x: (el.offsetLeft - newPosX),
+                            y: (el.offsetTop - newPosY),
+                        },
+                    });
+                }
+                document.removeEventListener("mouseup", mouseUpHandler);
+            }
+            
+            document.addEventListener("mouseup", mouseUpHandler);
+        }
+
+        const chipCurrent = chipRef.current;
+        if(chipCurrent){
+            chipCurrent.addEventListener('mousedown', onMouseOverHandler)
+        }
+        return () => {
+            if(chipCurrent){
+                chipCurrent.removeEventListener('mousedown', onMouseOverHandler)
+            }
+        }
+    }, [chip]);
 
     return (
         <div 
@@ -299,9 +343,9 @@ const Chip: React.FC<IChip> = (chip) => {
                 position: 'absolute',
                 zIndex: 1,
             }} 
-            onMouseDown={onMouseOverHandler}
+            // onMouseDown={onMouseOverHandler}
         >
-            <ChipEndurence {...chip}/>
+            <ChipEndurence {...chip} chipRef={chipRef}/>
         </div>
     );
 }

@@ -27,6 +27,11 @@ export interface IChip {
     originLayerId: string;
 }
 
+export interface Resolution {
+    width: number;
+    height: number;
+}
+
 export interface IChipLayer {
     id: string;
     name: string;
@@ -36,4 +41,5 @@ export interface IChipLayer {
     outputs: IInputOutputPoint[];
     chips: IChip[];
     wires: IWire[];
+    resolution: Resolution;
 }

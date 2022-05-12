@@ -21,6 +21,7 @@ interface ILayersContext{
     getNewLayer: () => IChipLayer;
     removeLayer: (layerId: string) => void;
     setLayers: (layers:IChipLayer[]) => void;
+    addLayers: (layers:IChipLayer[]) => void;
 }
 
 const basicLayerFns = {
@@ -46,6 +47,10 @@ export default create<ILayersContext>((set, get) => ({
     layerFns:{...basicLayerFns},
     activeLayerId: '',
     layers: [],
+    resolution: {
+        width: 1024,
+        height: 768,
+    },
     setLayers: (layers:IChipLayer[]) => {
         const {publishLayer} = get();
         set({
@@ -59,6 +64,20 @@ export default create<ILayersContext>((set, get) => ({
             }
         });      
     },
+    addLayers: (newLayers:IChipLayer[]) => {
+        const {publishLayer, layers} = get();
+        const publishedLayers = newLayers.filter(layer => layer.version > 0);
+        set({
+            layerFns: {...basicLayerFns},
+            layers: [...publishedLayers, ...layers],
+        });
+        [...publishedLayers, ...layers].forEach((layer) => {
+            if(layer.version > 0){
+                layer.version -= 1;
+                publishLayer(layer);
+            }
+        });
+    },   
     getNewLayer: () => {
         const nextId = `${nextUID()}`;
         return  {
@@ -70,6 +89,10 @@ export default create<ILayersContext>((set, get) => ({
             outputs: [],
             chips: [],
             wires: [],
+            resolution: {
+                width: 0,
+                height: 0,
+            },
         };
     },
     removeLayer: (layerId: string) => {

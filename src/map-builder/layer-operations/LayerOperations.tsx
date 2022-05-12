@@ -6,6 +6,9 @@ import floppyDiskIcon from '../assets/floppydiskmono_105949_white.png';
 import arrowLeftIcon from '../assets/arrow-left-white.png';
 import useChipLayer from '../stores/useChipLayer';
 import { debounce } from '../../util/debounce';
+import useResolution from '../stores/useResolution';
+import fullScreen from '../assets/fullscreen.png';
+import colors from '../../ui/colors';
 
 const LayerOperationsWrap = styled.div`
     background-color: #ffffff38;
@@ -26,6 +29,13 @@ const LayerTitle = styled.div`
         border-color: transparent;
         height: 2rem;
         font-size: 2rem;
+    }
+    > input[type=text] {
+        width: 100%;
+        &::placeholder {
+            color: ${colors['blue.200']};
+            opacity: 1;
+        }
     }
 `;
 
@@ -52,6 +62,11 @@ const RollbackBtn = styled(btn)`
     background-size: 16px 16px;
 `;
 
+const AdjustScreenBtn = styled(btn)`
+    background-image: url(${fullScreen});
+    background-size: 16px 16px;
+`;
+
 
 
 const LayerOperations: React.FC = () => {
@@ -64,6 +79,7 @@ const LayerOperations: React.FC = () => {
     }
 
     const onPublish = async () => {
+        const {resolution} = useResolution.getState();
         const {publishLayer, getNewLayer, addLayer, setActiveLayerId} = useChipLayers.getState();
         const layer = useChipLayer.getState();
         if(layer.name.trim().length < 2){
@@ -71,15 +87,16 @@ const LayerOperations: React.FC = () => {
         }
         await publishLayer(layer);
         const nLayer = getNewLayer();
+        nLayer.resolution = {...resolution};
         addLayer(nLayer);
         setActiveLayerId(nLayer.id);
         useChipLayer.getState().updateLayer(nLayer);
     }
 
     const onRepublish = async (idLayer: string) => {
-        const {updateLayer} = useChipLayer.getState();
-        const {getLayerById, publishNewLayerVersion} = useChipLayers.getState();
-        const layer = getLayerById(idLayer);
+        const {updateLayer, getLayer} = useChipLayer.getState();
+        const {publishNewLayerVersion} = useChipLayers.getState();
+        const layer = getLayer();
         if(!!layer){
             const publishedLayer = await publishNewLayerVersion(layer);
             updateLayer(publishedLayer);
@@ -101,6 +118,16 @@ const LayerOperations: React.FC = () => {
         }
     }
 
+    const adjustResolution = () => {
+        const {resolution} = useResolution.getState();
+        const {updateLayer, getLayer} = useChipLayer.getState();
+        const {updateLayer: updateLayerInLayers} = useChipLayers.getState();
+        const layer = getLayer();
+        layer.resolution = {...resolution};
+        updateLayer(layer);
+        updateLayerInLayers(layer);
+    }
+
     return (
         <LayerOperationsWrap>
             {!!activeLayer && activeLayer.version > 0 && (
@@ -112,6 +139,7 @@ const LayerOperations: React.FC = () => {
                         placeholder="Input the chip name"
                         type="text"
                         defaultValue={activeLayer?.name}
+                        maxLength={15}
                         onInput={debounce<React.ChangeEvent<HTMLInputElement>>(onChangeNameHandler, 500)}
                     />
                 )}
@@ -119,6 +147,7 @@ const LayerOperations: React.FC = () => {
                     <label>{activeLayer.name}-{activeLayer.version}</label>
                 )}
             </LayerTitle>
+            <AdjustScreenBtn onClick={adjustResolution}/>
             {!!activeLayer && activeLayer?.version > 0 && (
                 <>
                     <SaveBtn onClick={() => onRepublish(activeLayer.id)}/>

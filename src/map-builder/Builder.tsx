@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import ToolSet from './tools/ToolSet';
 import ProjectProperties from './project-properties/ProjectProperties';
 import styled from 'styled-components';
-// import buildBgEditor from './assets/bg-build.png';
 import Chip from './chip/Chip';
 import LineTo from './line-to/LineTo';
 import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
@@ -11,12 +10,15 @@ import { IChip } from '../interfaces/interfaces';
 import { Droppable, IDroppableEvent } from '../ui/Draggable';
 import LayerOperations from './layer-operations/LayerOperations';
 import colors from '../ui/colors';
+import useResolution from './stores/useResolution';
 
 const BuilderWrap = styled.div`
     box-sizing: border-box;
     position: relative;
+    // width: 1024px;
+    // height: 768px;
     width: 100%;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-flow: row no-wrap;
     overflow: hidden;
@@ -33,28 +35,20 @@ const Panel = styled.div`
     flex-flow: row no-wrap;
     flex-direction: column;
     overflow: hidden;
-    width: 275px;
+    width: 250px;
     box-sizing: border-box;
 `
 
-const CenterPanel = styled.div`
-    box-sizing: border-box;
+const CenterPanelBox = styled.div`
     position: relative;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    overflow: hidden;
-    box-sizing: border-box;
-`
+    overflow: auto;
+    height: calc(100vh - 54px);
+`;
 
 const BoxStage = styled.div`
-    flex-grow: 1;
-    box-sizing: border-box;
-    overflow: auto;
     position: relative;
     display: flex;
-    flex-direction: row;  
+    flex-direction: row;
 `;
 
 const SubStageBox = styled.div`
@@ -84,6 +78,41 @@ const InputsBox = styled(InputOutputBox)`
 const OutputsBox = styled(InputOutputBox)`
     right: 0;
 `;
+
+const CenterPanelWrap = styled.div`
+    flex-grow: 1;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100vh;
+    width: calc(100vw - 200px);
+`;
+
+const CenterPanel: React.FC = () => {
+    const stageRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const stageCurrent = stageRef.current;
+        if(stageCurrent){
+            const rect = stageCurrent.getBoundingClientRect();
+            // console.log('rect', rect);
+            useResolution.getState().setResolution({
+                width: rect.width,
+                height: rect.height,
+            });
+        }
+    }, []);
+    
+    return (
+        <CenterPanelWrap>
+            <LayerOperations/>
+            <CenterPanelBox ref={stageRef} id="center_panel_box">                
+                <LayerRender/>
+            </CenterPanelBox>
+        </CenterPanelWrap>
+    )
+}
 
 const DropStage: React.FC = () => {
     const dropRef = useRef<HTMLDivElement>(null);
@@ -166,8 +195,15 @@ const Wires: React.FC = () => {
 
 
 const LayerRender: React.FC = () => {
+    const resolution = useChipLayer(state => state.resolution); 
     return (
-        <BoxStage draggable={false}>
+        <BoxStage
+            draggable={false}
+            style={{
+                width: `${resolution.width}px`,
+                height: `${resolution.height}px`,
+            }}
+         >
             <Inputs/>
             <DropStage/>
             <Outputs/>
@@ -175,17 +211,14 @@ const LayerRender: React.FC = () => {
     );
 }
 
-const Builder: React.FC = () => { 
+const Builder: React.FC = () => {
     return (
         <BuilderWrap>
             <Panel>
                 <ProjectProperties/>
                 <ToolSet/>
             </Panel>
-            <CenterPanel>
-                <LayerOperations/>
-                <LayerRender/>
-            </CenterPanel>
+            <CenterPanel/>
         </BuilderWrap>
     );
 }

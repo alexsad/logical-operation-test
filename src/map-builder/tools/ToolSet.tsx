@@ -25,6 +25,7 @@ const ToolSetBox = styled.div`
     background-color: rgba(0,0,0,.1);
     // border: 1px solid red;
     overflow-y: auto;
+    overflow-x: hidden;
     height: 100%;
 
     > * {
@@ -120,7 +121,7 @@ const ToolSet: React.FC = () => {
         {
             id: 'decimal_display',
             name: 'decimal_display',
-            version: 1,
+            version: 2,
             inputs: [
                 {
                     id: 'in_1',
