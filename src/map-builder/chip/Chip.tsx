@@ -150,6 +150,23 @@ const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: stri
     );
 }
 
+const LCDDisplay: React.FC<{inputs: boolean[]}> = ({inputs}) => {
+    const [firstInput, ...others] = inputs;
+    if(firstInput){
+        const decimalResult = parseInt(others.map(v => v ? '1' : '0').join('') , 2);
+        return (
+            <LCDChipDisplay>
+                -{8 - decimalResult}
+            </LCDChipDisplay>
+        );
+    }
+    return (
+        <LCDChipDisplay>
+            {parseInt( inputs.map(v => v ? '1' : '0').join('') , 2)}
+        </LCDChipDisplay>
+    );
+}
+
 const ChipEndurence: React.FC<IChip & {chipRef: React.RefObject<HTMLDivElement>}> = ({id, name, version, inputs, outputs, originLayerId, chipRef}) => {
     const customInputs = [...inputs];
     const customOutputs = [...outputs];
@@ -209,9 +226,7 @@ const ChipEndurence: React.FC<IChip & {chipRef: React.RefObject<HTMLDivElement>}
             {originLayerId === "decimal_display" && ( 
                 <ChipDescription ref={chipRef}>
                     <TrashElement onClick={onRemoveChip} top={-1.8} right={1.5}/>
-                    <LCDChipDisplay>
-                        {parseInt( outputProcesseds.map(v => v ? '1' : '0').join('') , 2)}
-                    </LCDChipDisplay>
+                    <LCDDisplay inputs={outputProcesseds}/>
                     <ChipDescriptionVersion>version: {version}</ChipDescriptionVersion>
                 </ChipDescription>
             )}
