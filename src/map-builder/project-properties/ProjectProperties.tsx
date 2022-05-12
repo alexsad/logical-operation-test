@@ -51,7 +51,7 @@ const ProjectProperties: React.FC =  () => {
     }
 
     const downloadProject = () => {
-        const layers = useChipLayers.getState().layers.filter(layer => layer.version > 0);
+        const layers = useChipLayers.getState().layers;
         const projectStructure: IProjectStructure = {
             layers,
             projectName,

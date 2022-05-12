@@ -219,7 +219,7 @@ export default create<ILayersContext>((set, get) => ({
         });
     },
     addOutPoint: (point: IInputOutputPoint) => {
-        const {outputs} = get();
+        const {outputs} = get(); 
         const newId = `out_point_${nextUID()}`;
         outputs.push({
             ...point,

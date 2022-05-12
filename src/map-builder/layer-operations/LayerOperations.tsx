@@ -80,9 +80,9 @@ const LayerOperations: React.FC = () => {
     }
 
     const onRepublish = async (idLayer: string) => {
-        const {updateLayer} = useChipLayer.getState();
-        const {getLayerById, publishNewLayerVersion} = useChipLayers.getState();
-        const layer = getLayerById(idLayer);
+        const {updateLayer, getLayer} = useChipLayer.getState();
+        const {publishNewLayerVersion} = useChipLayers.getState();
+        const layer = getLayer();
         if(!!layer){
             const publishedLayer = await publishNewLayerVersion(layer);
             updateLayer(publishedLayer);
