@@ -94,14 +94,29 @@ const CenterPanel: React.FC = () => {
     const stageRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const stageCurrent = stageRef.current;
+        const onResize = () => {
+            if(stageCurrent){
+                const rect = stageCurrent.getBoundingClientRect();
+                useResolution.getState().setResolution({
+                    width: rect.width,
+                    height: rect.height,
+                });
+            }
+        }
         if(stageCurrent){
             const rect = stageCurrent.getBoundingClientRect();
-            // console.log('rect', rect);
             useResolution.getState().setResolution({
                 width: rect.width,
                 height: rect.height,
             });
+
         }
+        window.addEventListener('resize', onResize);
+        
+        return () => {
+            window.removeEventListener('resize', onResize);
+        }
+
     }, []);
     
     return (
@@ -161,7 +176,7 @@ const Chips: React.FC = () => {
             }
         }, state => state.chips);
         return () => {
-            unSub()
+            unSub();
         }
     }, [chips]);
     return (
@@ -195,7 +210,7 @@ const Wires: React.FC = () => {
 
 
 const LayerRender: React.FC = () => {
-    const resolution = useChipLayer(state => state.resolution); 
+    const resolution = useChipLayer(state => state.resolution);
     return (
         <BoxStage
             draggable={false}

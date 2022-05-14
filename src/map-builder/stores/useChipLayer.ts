@@ -29,7 +29,7 @@ const firstLayerId =  `${nextUID()}`;
 export default create<ILayersContext>((set, get) => ({
     selectedOutputId: null,
     id: firstLayerId,
-    name: '*',
+    name: '',
     version: 0,
     visible: true,
     inputs: [],

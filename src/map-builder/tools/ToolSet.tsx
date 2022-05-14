@@ -45,10 +45,11 @@ const ToolSetBox = styled.div`
 `;
 
 const ToolSet: React.FC = () => {
-    const {layers} = useChipLayers();
+    const layers = useChipLayers(state => state.layers);
+    const activeLayerId = useChipLayers(state => state.activeLayerId);
 
     const publishedLayer:IChip[] = layers
-        .filter(layer => layer.version > 0 && layer.id && !layer.visible)
+        .filter(layer => layer.version > 0 && layer.id !== activeLayerId)
         .map(layer => {
             return {
                 id: layer.id,
@@ -64,9 +65,7 @@ const ToolSet: React.FC = () => {
                 position: { x: 0, y: 0},
                 originLayerId: layer.id,
             }
-        })
-
-
+        });
 
     const chips: IChip[] = [
         {
@@ -121,7 +120,7 @@ const ToolSet: React.FC = () => {
         {
             id: 'decimal_display',
             name: 'decimal_display',
-            version: 2,
+            version: 3,
             inputs: [
                 {
                     id: 'in_1',
