@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { IInputOutputPoint } from '../../interfaces/interfaces';
 import colors from '../../ui/colors';
@@ -152,6 +152,7 @@ const OutputPointAdd: React.FC = () => {
 
 const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
     const selectedOutputId = useChipLayer(state => state.selectedOutputId);
+    const [isActive, setIsActive] = useState(false);
     const isSelected = selectedOutputId ===  id;
     const onSetInputPoint = (evt: React.MouseEvent) => {
         evt.stopPropagation();
@@ -159,7 +160,8 @@ const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
         useChipLayer.getState().setSelectedOutputId(id);
     }
     const setActiveInactive = () => {
-        useChipLayer.getState().activateInputSource(id, !active);
+        setIsActive(oldState => !oldState);
+        useChipLayer.getState().activateInputSource(id, !isActive);
     }
     const onRemovePoint = () => {
         useChipLayer.getState().removeInput(id);
@@ -173,9 +175,9 @@ const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
     const onChangeLabel = (newLabel: string) => {
         useChipLayer.getState().changeInputLabel(id, newLabel);
     }
-    const outBorderColor = isSelected ? colors['yellow.100'] : active ? colors['blue.300'] : colors['blue.300'];
-    const innerBGColor = active ? colors['blue.300'] : 'transparent';
-    const innerSpinBGColor = active ? colors['blue.200'] : colors['blue.300'];
+    const outBorderColor = isSelected ? colors['yellow.100'] : isActive ? colors['blue.300'] : colors['blue.300'];
+    const innerBGColor = isActive ? colors['blue.300'] : 'transparent';
+    const innerSpinBGColor = isActive ? colors['blue.200'] : colors['blue.300'];
     return (
         <InputOutputPoint
             onClick={setActiveInactive}
@@ -190,7 +192,7 @@ const InputPoint: React.FC<IInputOutputPoint> = ({id, active, label}) => {
                     id={id}
                     onClick={onSetInputPoint}
                     bgColor={innerSpinBGColor}
-                    active={active}
+                    active={isActive}
                 />
             </InputLabel>
             <TrashElement top={-1} right={-1} onClick={onRemovePoint}/>
