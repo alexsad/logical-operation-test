@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { IChip } from '../../interfaces/interfaces';
+import { IChip, IInputOutputPoint } from '../../interfaces/interfaces';
 import colors from '../../ui/colors';
 import { Draggable, IDroppableEvent } from '../../ui/Draggable';
 import TrashElement from '../float-remove-btn/FloatRemoveBtn';
@@ -112,7 +112,7 @@ const LCDChipDisplay = styled.div`
     text-align: center;
 `;
 
-const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active}) => {
+const ChipInput:React.FC<IInputOutputPoint> = ({id:inputId, active, label}) => {
     const bgColor = active ? colors['blue.200'] : 'transparent';
     const borderColor = active ? colors['blue.200'] : colors['blue.300'];
     const onSetInputId = () => {
@@ -128,12 +128,13 @@ const ChipInput:React.FC<{inputId: string, active: boolean}> = ({inputId, active
             borderColor={borderColor}
             id={inputId} 
             onClick={onSetInputId}
+            title={label}
         />
     );
 }
 
 
-const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: string, active: boolean, isSelectedOutputId: boolean}> = ({outputId, active}) => {
+const ChipOutput:React.FC<IInputOutputPoint> = ({active, id: outputId, label}) => {
     const selectedOutputId = useChipLayer(state => state.selectedOutputId);
     const bgColor = active ? colors['blue.200'] : 'transparent';
     const borderColor =  selectedOutputId === outputId ? colors['yellow.100'] : active ? colors['blue.200'] : colors['blue.300'];
@@ -146,23 +147,24 @@ const ChipOutput:React.FC<{outputId: string, originLayerId: string, chipId: stri
             borderColor={borderColor}
             bgColor={bgColor}
             onClick={connectPoints} id={outputId}
+            title={label}
         />
     );
 }
 
 const LCDDisplay: React.FC<{inputs: boolean[]}> = ({inputs}) => {
-    const [firstInput, ...others] = inputs;
-    if(firstInput){
-        const decimalResult = parseInt(others.map(v => v ? '1' : '0').join('') , 2);
-        return (
-            <LCDChipDisplay>
-                -{8 - decimalResult}
-            </LCDChipDisplay>
-        );
-    }
+    // const [firstInput, ...others] = inputs;
+    // if(firstInput){
+    //     const decimalResult = parseInt(others.map(v => v ? '1' : '0').join('') , 2);
+    //     return (
+    //         <LCDChipDisplay>
+    //             -{8 - decimalResult}
+    //         </LCDChipDisplay>
+    //     );
+    // }
     return (
         <LCDChipDisplay>
-            {parseInt( inputs.map(v => v ? '1' : '0').join('') , 2)}
+            {parseInt( inputs.map(v => v ? '1' : '0').join('') , 2).toString(16)}
         </LCDChipDisplay>
     );
 }
@@ -217,9 +219,8 @@ const ChipEndurence: React.FC<IChip & {chipRef: React.RefObject<HTMLDivElement>}
             <ChipInputBox>
                 {customInputs.map((input) => (
                     <ChipInput 
-                        key={`${id}_in_${input.id}`} 
-                        inputId={input.id}
-                        active={input.active}
+                        key={`${id}_in_${input.id}`}
+                        {...input}
                     />
                 ))}
             </ChipInputBox>
@@ -243,12 +244,8 @@ const ChipEndurence: React.FC<IChip & {chipRef: React.RefObject<HTMLDivElement>}
             <ChipInputRightBox>
                 {customOutputs.map((output) => (
                     <ChipOutput 
-                        key={`${id}_out_${output.id}`} 
-                        chipId={id} 
-                        originLayerId={originLayerId} 
-                        outputId={output.id}
-                        active={output.active}
-                        isSelectedOutputId={true}
+                        key={`${id}_out_${output.id}`}
+                        {...output}
                     />
                 ))}
             </ChipInputRightBox>
@@ -282,9 +279,14 @@ const Chip: React.FC<IChip> = (chip) => {
     
             const el = elRef.current;
             if(el){
+                const top = (el.offsetTop - newPosY);
+                const left = (el.offsetLeft - newPosX);
                 // set the element's new position:
-                el.style.top = (el.offsetTop - newPosY) + "px";
-                el.style.left = (el.offsetLeft - newPosX) + "px";
+                if(top < 0 || left < 0){
+                    return;
+                }
+                el.style.top = top + "px";
+                el.style.left = left + "px";
             }
             globalThis.dispatchEvent(
                 new CustomEvent('chip:move', {})
@@ -308,12 +310,17 @@ const Chip: React.FC<IChip> = (chip) => {
                 document.removeEventListener("mousemove", mouseMove);
                 const el = elRef.current;
                 if(el){
+                    const x = (el.offsetLeft - newPosX);
+                    const y = (el.offsetTop - newPosY);
+                    if(y < 0 || x < 0){
+                        return;
+                    }
                     // set the element's new position:
                     useChipLayer.getState().moveChip({
                         ...chip,
                         position: {
-                            x: (el.offsetLeft - newPosX),
-                            y: (el.offsetTop - newPosY),
+                            x,
+                            y,
                         },
                     });
                 }
@@ -352,7 +359,7 @@ const Chip: React.FC<IChip> = (chip) => {
 
 const ChipPreview: React.FC<IChip> = (chip) => {
     const dragRef = useRef<HTMLDivElement>(null);
-    const {id, name, version, inputs, outputs, originLayerId} = chip;
+    const {id, name, version, inputs, outputs} = chip;
     const handlerDrop = (dataStr: string, event: IDroppableEvent) => {
         const { target, mousePosition } = event;
         if(target && !!dataStr){
@@ -406,8 +413,8 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                     {inputs.map((input) => (
                         <ChipInput 
                             key={`${id}_in_${input.id}`}
-                            inputId={input.id}
-                            active={input.active}
+                            {...input}
+                            active={false}
                         />
                     ))}
                 </ChipInputBox>
@@ -423,11 +430,7 @@ const ChipPreview: React.FC<IChip> = (chip) => {
                     {outputs.map((output) => (
                         <ChipOutput 
                             key={`${id}_out_${output.id}`}
-                            chipId={id}
-                            originLayerId={originLayerId}
-                            outputId={output.id}
-                            active={output.active}
-                            isSelectedOutputId={false}
+                            {...output}
                         />
                     ))}
                 </ChipInputRightBox>

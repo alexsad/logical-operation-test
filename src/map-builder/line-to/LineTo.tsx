@@ -19,8 +19,8 @@ const LineToWrap = styled.div`
 `;
 
 const LineToBox = styled.div`
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     position: absolute;
     z-index: 1;
 `;
@@ -116,10 +116,8 @@ const LineTo: React.FC<IWire> = ({chipInputId, chipOutputId, id, active}) => {
                 style={{backgroundColor: active ? colors['blue.200'] : colors['blue.300'], borderColor: isSelected ? colors['yellow.100'] : 'transparent'}}
                 ref={elRef}
                 onClick={onClick}
-            >
-                
-            </LineToWrap>
-            <LineToBox ref={helperElRef}>
+            />
+            <LineToBox style={{display: isSelected ? 'block' : 'none'}} ref={helperElRef}>
                 {isSelected && (
                     <SimpleTrashElement onClick={onRemoveWire}/>
                 )}
