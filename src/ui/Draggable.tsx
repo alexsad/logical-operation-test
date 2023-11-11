@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import dropCursor from './assets/cursor/chip_icon_32x32.png';
 import styled from 'styled-components';
+import { ReactProps } from '../interfaces/interfaces';
 
 export interface IDroppableEvent {
     target: HTMLElement,
@@ -32,7 +33,7 @@ const DraggableImg = styled.img`
 const TOUCH_DROP_EVENT = 'TOUCH:DROP';
 const DROP_END_EVENT = 'DROP:END';
 
-const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) => {
+const Draggable: React.FC<IDraggable & ReactProps> = ({children, refElement, data, onDrop}) => {
     const refDragImag = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
@@ -154,7 +155,7 @@ const Draggable: React.FC<IDraggable> = ({children, refElement, data, onDrop}) =
     );
 }
 
-const Droppable: React.FC<IDroppable> = ({children, refElement, onDrop}) => {
+const Droppable: React.FC<IDroppable & ReactProps> = ({children, refElement, onDrop}) => {
 
     useEffect(() => {
         const currentElement = refElement.current;

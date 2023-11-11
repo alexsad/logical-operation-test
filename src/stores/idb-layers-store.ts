@@ -1,14 +1,25 @@
-import { openDB } from 'idb/with-async-ittr.js';
+import { IChipLayer } from "../interfaces/interfaces";
 
 export const LAYERS_STORE_KEY = 'layers';
 
-const openLayerStore = () => {
-    const dbPromise = openDB(`store_${LAYERS_STORE_KEY}_1`, 1, {
-        upgrade(db) {
-          db.createObjectStore(LAYERS_STORE_KEY);
-        },
-    });
-    return dbPromise;
+const openLayerStore = async () => {
+    return {
+      add: (nlayer: IChipLayer) => {
+        const layersSTR = localStorage.getItem(LAYERS_STORE_KEY) || '[]';
+        const layers = JSON.parse(layersSTR) as IChipLayer[];
+        layers.push(nlayer);
+        localStorage.setItem(LAYERS_STORE_KEY, JSON.stringify(layers));
+      },
+      remove: (layerId: string) => {
+        const layersSTR = localStorage.getItem(LAYERS_STORE_KEY) || '[]';
+        const layers = JSON.parse(layersSTR) as IChipLayer[];
+        localStorage.setItem(LAYERS_STORE_KEY, JSON.stringify(layers.filter(layerItem=> layerItem.id === layerId)));
+      },
+      get : () => {
+        const layers = localStorage.getItem(LAYERS_STORE_KEY) || '[]';
+        return JSON.parse(layers) as IChipLayer[];
+      }
+    }
 }
 
 export {openLayerStore};

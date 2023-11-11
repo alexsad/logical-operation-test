@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { ReactProps } from '../interfaces/interfaces';
 
 const ContainerWrap = styled.div`
     width: 100%;
@@ -46,7 +47,7 @@ const SubContainer = styled.div`
     width: calc(100% - .6rem);
 `;
 
-const TabBox: React.FC<{title: string, tabTitle: string}> = ({children, title, tabTitle}) => {
+const TabBox: React.FC<ReactProps & {title: string, tabTitle: string}> = ({children, title, tabTitle}) => {
     const [collapsed, setCollapsed] = useState(false);
 
     const onClick = () => {

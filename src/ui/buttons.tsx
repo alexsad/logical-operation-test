@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react';
 import styled from 'styled-components';
 import colors from './colors';
 import RingAudioCenter from './RingCenter';
+import { ReactProps } from '../interfaces/interfaces';
 
 const CloseButton = styled.div`
     width: 1.5rem;
@@ -83,7 +84,7 @@ const NegativeButton = styled(ConfirmButton)`
 
 export {NegativeButton};
 
-const SellBuyItemRingEffect: React.FC = ({children}) => {
+const SellBuyItemRingEffect: React.FC<ReactProps> = ({children}) => {
     const onClickHandler = () => {
         RingAudioCenter.src("/assets/tracks/sellxbuy_item.wav");
         RingAudioCenter.play();

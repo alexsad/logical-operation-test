@@ -43,3 +43,7 @@ export interface IChipLayer {
     wires: IWire[];
     resolution: Resolution;
 }
+
+export type ReactProps = {
+    children?: React.ReactNode,
+};

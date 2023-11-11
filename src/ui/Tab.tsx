@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import FrameGoldenBox from './FrameGolden';
 import Line from './Line';
+import { ReactProps } from '../interfaces/interfaces';
 
 const ContentBoxFrame = styled(FrameGoldenBox)`
     display: flex;
@@ -62,7 +63,7 @@ const useTabContext = () => {
 	return context
 }
 
-const Tab:React.FC<{active: string}> & TabComponents= ({children, active}) => {
+const Tab:React.FC<ReactProps & {active: string}> & TabComponents= ({children, active}) => {
     const [activeTab, setActiveTab] = useState(active)
     return (
         <ContentBoxFrame>
@@ -76,7 +77,7 @@ const Tab:React.FC<{active: string}> & TabComponents= ({children, active}) => {
     )
 };
 
-const Tabs: React.FC = ({children}) => {
+const Tabs: React.FC<ReactProps> = ({children}) => {
     return (
         <div>
             <TabTitles>
@@ -89,7 +90,7 @@ const Tabs: React.FC = ({children}) => {
 
 Tab.Tabs = Tabs;
 
-const Sessions: React.FC = ({children}) => {
+const Sessions: React.FC<ReactProps> = ({children}) => {
     return (
         <TabSessionContent>{children}</TabSessionContent>
     )
@@ -111,7 +112,7 @@ Tab.Title = Title;
 
 Tab.Sessions = Sessions;
 
-const Session: React.FC<{label: string}> = ({children, label}) => {
+const Session: React.FC<ReactProps & {label: string}> = ({children, label}) => {
     const {activeTab} = useTabContext();
     if(activeTab !== label){
         return null;

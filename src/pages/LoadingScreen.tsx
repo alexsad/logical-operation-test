@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ProgressBar from '../ui/ProgressBar';
+import { ReactProps } from '../interfaces/interfaces';
 
 const LoadingScreenWrap = styled.div`
     width: 100vw;
@@ -53,7 +54,7 @@ const ProgressLoading: React.FC = () => {
     );
 }
 
-const LoadingScreen: React.FC = ({children}) => {
+const LoadingScreen: React.FC<ReactProps> = ({children}) => {
     return (
         <LoadingScreenWrap>
             <ProgressLoading/>

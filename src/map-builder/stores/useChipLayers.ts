@@ -276,9 +276,8 @@ export default create<ILayersContext>((set, get) => ({
         const {layers} = get();
         layers.push(layer);
 
-        const dbPromise = openLayerStore();
-        (await dbPromise).add(LAYERS_STORE_KEY, layer, layer.id);
-        (await dbPromise).close();        
+        const {add} = await openLayerStore();
+        add(layer);   
     },
     addLayer: (layerToSave: IChipLayer) => {
         const {layers} = get();

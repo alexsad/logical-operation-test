@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { ReactProps } from '../interfaces/interfaces';
 
 interface CircularProgressProps {
     percent: number;
@@ -17,7 +18,7 @@ const CircularProgressWrapp = styled.div<CircularProgressProps>`
     border-radius: 50%;
 `;
 
-const CircularProgress: React.FC<CircularProgressProps> = ({percent, color, size, children}) => {
+const CircularProgress: React.FC<CircularProgressProps & ReactProps> = ({percent, color, size, children}) => {
     
     return (
         <CircularProgressWrapp percent={percent} size={size} color={color}>

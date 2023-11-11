@@ -168,17 +168,8 @@ const Inputs: React.FC = () => {
 }
 
 const Chips: React.FC = () => {
-    const [chips, setChips] = useState([] as IChip[]);
-    useEffect(() => {
-        const unSub = useChipLayer.subscribe((currChips: IChip[]) => {
-            if(currChips.length !== chips.length){
-                setChips(() => [...currChips]);
-            }
-        }, state => state.chips);
-        return () => {
-            unSub();
-        }
-    }, [chips]);
+    const [chips] = useState([] as IChip[]);
+
     return (
         <>
             {chips.map(chip => (
