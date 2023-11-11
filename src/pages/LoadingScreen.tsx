@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ReactProps } from '../interfaces/interfaces';
-import ProgressBar from '../ui/ProgressBar';
+import { ProgressBar } from '../ui/ProgressBar';
 
 const LoadingScreenWrap = styled.div`
     width: 100vw;
@@ -49,7 +49,7 @@ const ProgressLoading: React.FC = () => {
     return (
         <ProgressLoadingWrap>
             LOADING....
-            <ProgressBar $color="green" $value={progress} />
+            <ProgressBar />
         </ProgressLoadingWrap>
     );
 }

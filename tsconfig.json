@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
+    ],
+    "types": [
+      "vite/client"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -21,6 +24,10 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "src/setupProxy.js"
   ]
 }

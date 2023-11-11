@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import TabContainer from '../TabContainer';
-// import { IChipLayer } from '../../interfaces/interfaces';
-import useChipLayers from '../stores/useChipLayers';
-import useChipLayer from '../stores/useChipLayer';
 import { IChipLayer } from '../../interfaces/interfaces';
 import colors from '../../ui/colors';
-import { ConfirmButton } from '../../ui/buttons';
+import { BtnAction } from '../../ui/forms';
+import TabContainer from '../TabContainer';
+import useChipLayer from '../stores/useChipLayer';
+import useChipLayers from '../stores/useChipLayers';
 import useResolution from '../stores/useResolution';
 
 const ProjectPropertiesWrap = styled.div``;
@@ -42,11 +41,11 @@ interface IProjectStructure {
     layers: IChipLayer[],
 }
 
-const ProjectProperties: React.FC =  () => {
+const ProjectProperties: React.FC = () => {
     const [projectName, setProjectName] = useState('my-project');
     const resolution = useResolution(state => state.resolution);
 
-    const updateProjectName = ({target}:React.ChangeEvent<HTMLInputElement>) => {
+    const updateProjectName = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         setProjectName(target.value);
     }
 
@@ -58,45 +57,45 @@ const ProjectProperties: React.FC =  () => {
         }
         const projectStr = JSON.stringify(projectStructure);
         const element = document.createElement("a");
-        const file = new Blob([projectStr], {type: 'text/json'});
+        const file = new Blob([projectStr], { type: 'text/json' });
         element.href = URL.createObjectURL(file);
         element.download = `${projectName}.json`;
         document.body.appendChild(element); // Required for this to work in FireFox
         element.click();
     }
 
-    const uploadFileHandler = ({target}:React.ChangeEvent<HTMLInputElement>) => {
-		if(!window["FileReader"]){
-			return;
-		}
-        const {addLayers} = useChipLayers.getState(); 
-		let reader = new FileReader();
+    const uploadFileHandler = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+        if (!window["FileReader"]) {
+            return;
+        }
+        const { addLayers } = useChipLayers.getState();
+        let reader = new FileReader();
 
-		reader.onload = function (evt:any) {
-			if(evt.target.readyState !== 2){
-				return;	
-			}
-			if(evt.target.error) {
-				alert("Error while reading file");
-				return;
-			}
-            const {projectName, layers} = JSON.parse(evt.target.result) as IProjectStructure;
+        reader.onload = function (evt: any) {
+            if (evt.target.readyState !== 2) {
+                return;
+            }
+            if (evt.target.error) {
+                alert("Error while reading file");
+                return;
+            }
+            const { projectName, layers } = JSON.parse(evt.target.result) as IProjectStructure;
             setProjectName(projectName)
             addLayers(layers);
         };
-		reader.readAsText((target as unknown as {files:Blob[]}).files[0]);
+        reader.readAsText((target as unknown as { files: Blob[] }).files[0]);
     }
 
     useEffect(() => {
         // const {resolution} = useResolution.getState();
-        if(resolution.height > 0){
-            const {setResolution, getLayer} = useChipLayer.getState();
-            const {addLayer, setActiveLayerId, activeLayerId} = useChipLayers.getState();
+        if (resolution.height > 0) {
+            const { setResolution, getLayer } = useChipLayer.getState();
+            const { addLayer, setActiveLayerId, activeLayerId } = useChipLayers.getState();
             const layer = getLayer();
-            if(layer.version < 1){
-                setResolution({...resolution});
-                if(layer.id !== activeLayerId){
-                    addLayer({...layer});
+            if (layer.version < 1) {
+                setResolution({ ...resolution });
+                if (layer.id !== activeLayerId) {
+                    addLayer({ ...layer });
                     setActiveLayerId(layer.id);
                 }
                 globalThis.dispatchEvent(
@@ -104,7 +103,7 @@ const ProjectProperties: React.FC =  () => {
                 );
             }
         }
-    },[resolution]);
+    }, [resolution]);
 
     return (
         <TabContainer title="Project" tabTitle="Configurations">
@@ -115,27 +114,27 @@ const ProjectProperties: React.FC =  () => {
                         <input type="text" value={projectName} maxLength={40} onChange={updateProjectName} />
                     </Row>
                     <Row>
-                        <ConfirmButton>
+                        <BtnAction>
                             import project
-                            <input 
+                            <input
                                 style={{
                                     position: "absolute",
-                                    left:0,
-                                    right:0,
-                                    top:0,
-                                    bottom:0,
-                                    opacity:0,
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    opacity: 0,
                                 }}
                                 alt=""
                                 onChange={uploadFileHandler}
                                 type="file"
                             />
-                        </ConfirmButton>
+                        </BtnAction>
                     </Row>
                     <Row>
-                        <ConfirmButton onClick={downloadProject}>
+                        <BtnAction onClick={downloadProject}>
                             download project
-                        </ConfirmButton>
+                        </BtnAction>
                     </Row>
                 </PropertyInputs>
             </ProjectPropertiesWrap>
