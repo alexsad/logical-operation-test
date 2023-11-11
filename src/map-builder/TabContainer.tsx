@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ReactProps } from '../interfaces/interfaces';
+import addIcon from '../ui/assets/add.png';
+import minusIcon from '../ui/assets/minus.png';
 
 const ContainerWrap = styled.div`
     width: 100%;
@@ -21,6 +23,11 @@ const Title = styled.div`
     text-align: left;
     font-size: 1rem;
     padding: .2rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 const TabContainer = styled.div`
@@ -47,7 +54,11 @@ const SubContainer = styled.div`
     width: calc(100% - .6rem);
 `;
 
-const TabBox: React.FC<ReactProps & {title: string, tabTitle: string}> = ({children, title, tabTitle}) => {
+const ChangeVisibilityBtn = styled.img`
+    filter: invert(1);
+`;
+
+const TabBox: React.FC<ReactProps & { title: string, tabTitle: string }> = ({ children, title, tabTitle }) => {
     const [collapsed, setCollapsed] = useState(false);
 
     const onClick = () => {
@@ -59,8 +70,12 @@ const TabBox: React.FC<ReactProps & {title: string, tabTitle: string}> = ({child
             <Container>
                 <Title onClick={onClick}>
                     <span>{title}</span>
-                    {!collapsed && (<strong>&#8593;</strong>)}
-                    {collapsed && (<strong>&#8595;</strong>)}
+                    {!collapsed && (
+                        <ChangeVisibilityBtn src={minusIcon} />
+                    )}
+                    {collapsed && (
+                        <ChangeVisibilityBtn src={addIcon} />
+                    )}
                 </Title>
                 {!collapsed && (
                     <TabContainer>

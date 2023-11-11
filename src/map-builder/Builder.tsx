@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
-import ToolSet from './tools/ToolSet';
-import ProjectProperties from './project-properties/ProjectProperties';
 import styled from 'styled-components';
-import Chip from './chip/Chip';
-import LineTo from './line-to/LineTo';
-import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
-import useChipLayer from './stores/useChipLayer';
 import { IChip } from '../interfaces/interfaces';
 import { Droppable, IDroppableEvent } from '../ui/Draggable';
-import LayerOperations from './layer-operations/LayerOperations';
+import bgStage from '../ui/assets/bg-board.png';
 import colors from '../ui/colors';
+import Chip from './chip/Chip';
+import LayerOperations from './layer-operations/LayerOperations';
+import LineTo from './line-to/LineTo';
+import { InputPoint, InputPointAdd, OutputPoint, OutputPointAdd } from './point/InputOutputPoint';
+import ProjectProperties from './project-properties/ProjectProperties';
+import useChipLayer from './stores/useChipLayer';
 import useResolution from './stores/useResolution';
+import ToolSet from './tools/ToolSet';
 
 const BuilderWrap = styled.div`
     box-sizing: border-box;
@@ -22,8 +23,6 @@ const BuilderWrap = styled.div`
     display: flex;
     flex-flow: row no-wrap;
     overflow: hidden;
-    background: rgb(1,106,234);
-    background: radial-gradient(circle, rgba(1,106,234,1) 0%, rgba(0,25,65,1) 100%);  
 `;
 
 const Panel = styled.div`
@@ -43,6 +42,8 @@ const CenterPanelBox = styled.div`
     position: relative;
     overflow: auto;
     height: calc(100vh - 54px);
+    background-image: url(${bgStage});
+    background-color: white;
 `;
 
 const BoxStage = styled.div`
@@ -95,7 +96,7 @@ const CenterPanel: React.FC = () => {
     useEffect(() => {
         const stageCurrent = stageRef.current;
         const onResize = () => {
-            if(stageCurrent){
+            if (stageCurrent) {
                 const rect = stageCurrent.getBoundingClientRect();
                 useResolution.getState().setResolution({
                     width: rect.width,
@@ -103,7 +104,7 @@ const CenterPanel: React.FC = () => {
                 });
             }
         }
-        if(stageCurrent){
+        if (stageCurrent) {
             const rect = stageCurrent.getBoundingClientRect();
             useResolution.getState().setResolution({
                 width: rect.width,
@@ -112,18 +113,18 @@ const CenterPanel: React.FC = () => {
 
         }
         window.addEventListener('resize', onResize);
-        
+
         return () => {
             window.removeEventListener('resize', onResize);
         }
 
     }, []);
-    
+
     return (
         <CenterPanelWrap>
-            <LayerOperations/>
-            <CenterPanelBox ref={stageRef} id="center_panel_box">                
-                <LayerRender/>
+            <LayerOperations />
+            <CenterPanelBox ref={stageRef} id="center_panel_box">
+                <LayerRender />
             </CenterPanelBox>
         </CenterPanelWrap>
     )
@@ -131,13 +132,13 @@ const CenterPanel: React.FC = () => {
 
 const DropStage: React.FC = () => {
     const dropRef = useRef<HTMLDivElement>(null);
-    const onDropHandler = (dataStr: string, { target }: IDroppableEvent) => {};
+    const onDropHandler = (dataStr: string, { target }: IDroppableEvent) => { };
 
     return (
         <Droppable refElement={dropRef} onDrop={onDropHandler}>
             <SubStageBox draggable={false} ref={dropRef}>
-                <Chips/>
-                <Wires/>
+                <Chips />
+                <Wires />
             </SubStageBox>
         </Droppable>
     );
@@ -147,9 +148,9 @@ const Outputs: React.FC = () => {
     const outputs = useChipLayer(state => state.outputs);
     return (
         <OutputsBox>
-            <OutputPointAdd/>
+            <OutputPointAdd />
             {outputs.map(output => (
-                <OutputPoint key={`${output.id}`} active={output.active} id={output.id} label={output.label}/>
+                <OutputPoint key={`${output.id}`} active={output.active} id={output.id} label={output.label} />
             ))}
         </OutputsBox>
     );
@@ -159,9 +160,9 @@ const Inputs: React.FC = () => {
     const inputs = useChipLayer(state => state.inputs);
     return (
         <InputsBox>
-            <InputPointAdd/>
+            <InputPointAdd />
             {inputs.map(input => (
-                <InputPoint key={`${input.id}`} active={input.active} id={input.id} label={input.label}/>
+                <InputPoint key={`${input.id}`} active={input.active} id={input.id} label={input.label} />
             ))}
         </InputsBox>
     );
@@ -173,7 +174,7 @@ const Chips: React.FC = () => {
     return (
         <>
             {chips.map(chip => (
-                <Chip 
+                <Chip
                     key={`${chip.id}`}
                     {...chip}
                 />
@@ -187,7 +188,7 @@ const Wires: React.FC = () => {
     return (
         <>
             {wires.map(wire => (
-                <LineTo 
+                <LineTo
                     key={`${wire.chipOutputId}_${wire.chipInputId}`}
                     id={wire.id}
                     chipOutputId={wire.chipOutputId}
@@ -209,10 +210,10 @@ const LayerRender: React.FC = () => {
                 width: `${resolution.width}px`,
                 height: `${resolution.height}px`,
             }}
-         >
-            <Inputs/>
-            <DropStage/>
-            <Outputs/>
+        >
+            <Inputs />
+            <DropStage />
+            <Outputs />
         </BoxStage>
     );
 }
@@ -221,10 +222,10 @@ const Builder: React.FC = () => {
     return (
         <BuilderWrap>
             <Panel>
-                <ProjectProperties/>
-                <ToolSet/>
+                <ProjectProperties />
+                <ToolSet />
             </Panel>
-            <CenterPanel/>
+            <CenterPanel />
         </BuilderWrap>
     );
 }

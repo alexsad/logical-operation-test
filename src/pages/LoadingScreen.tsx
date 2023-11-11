@@ -48,7 +48,6 @@ const ProgressLoading: React.FC = () => {
 
     return (
         <ProgressLoadingWrap>
-            LOADING....
             <ProgressBar />
         </ProgressLoadingWrap>
     );

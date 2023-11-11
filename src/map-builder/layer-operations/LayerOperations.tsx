@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useDebouncedCallback } from 'use-debounce';
+import arrowLeftIcon from '../../ui/assets/arrows_move_prev.png';
+import floppyDiskIcon from '../../ui/assets/save.png';
+import trashIcon from '../../ui/assets/trash.png';
 import colors from '../../ui/colors';
-import arrowLeftIcon from '../assets/arrow-left-white.png';
-import floppyDiskIcon from '../assets/floppydiskmono_105949_white.png';
-import fullScreen from '../assets/fullscreen.png';
-import trashIcon from '../assets/trash-10-16.png';
 import useChipLayer from '../stores/useChipLayer';
 import useChipLayers from '../stores/useChipLayers';
 import useResolution from '../stores/useResolution';
@@ -40,38 +39,34 @@ const LayerTitle = styled.div`
 `;
 
 const btn = styled.div`
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     background-repeat: no-repeat;
     background-position: center center;
     border-radius: 50%;
     cursor: pointer;
+    filter: invert(1);
+    background-size: contain;
 `;
 
 const RemoveBtn = styled(btn)`
     background-image: url(${trashIcon});
+    margin-left: 1rem;
 `;
 
 const SaveBtn = styled(btn)`
     background-image: url(${floppyDiskIcon});
-    background-size: 16px 16px;
 `;
 
 const RollbackBtn = styled(btn)`
     background-image: url(${arrowLeftIcon});
-    background-size: 16px 16px;
 `;
-
-const AdjustScreenBtn = styled(btn)`
-    background-image: url(${fullScreen});
-    background-size: 16px 16px;
-`;
-
-
 
 const LayerOperations: React.FC = () => {
     const { layers, activeLayerId } = useChipLayers();
     const activeLayer = layers.find(({ id }) => activeLayerId === id);
+    const isEditableMode = !!activeLayer && activeLayer?.version === 0;
+    const isViewMode = !isEditableMode && !!activeLayer && activeLayer.version > 0;
 
     const onPublish = async () => {
         const { resolution } = useResolution.getState();
@@ -88,7 +83,7 @@ const LayerOperations: React.FC = () => {
         useChipLayer.getState().updateLayer(nLayer);
     }
 
-    const onRepublish = async (idLayer: string) => {
+    const onRepublish = async () => {
         const { updateLayer, getLayer } = useChipLayer.getState();
         const { publishNewLayerVersion } = useChipLayers.getState();
         const layer = getLayer();
@@ -96,11 +91,6 @@ const LayerOperations: React.FC = () => {
             const publishedLayer = await publishNewLayerVersion(layer);
             updateLayer(publishedLayer);
         }
-    }
-
-    const onRemove = async (idLayer: string) => {
-        const { removeLayer } = useChipLayers.getState();
-        removeLayer(idLayer);
     }
 
     const rollbackToDraft = async () => {
@@ -113,19 +103,10 @@ const LayerOperations: React.FC = () => {
         }
     }
 
-    const adjustResolution = () => {
-        const { resolution } = useResolution.getState();
-        const { getLayer, setResolution } = useChipLayer.getState();
-        const { updateLayer } = useChipLayers.getState();
-        const layer = getLayer();
-        layer.resolution = { ...resolution };
-        setResolution({ ...resolution });
-        updateLayer(layer);
-        setTimeout(() => {
-            globalThis.dispatchEvent(
-                new CustomEvent('chip:move', {})
-            );
-        }, 1000);
+    const onRemove = async () => {
+        const { removeLayer } = useChipLayers.getState();
+        removeLayer(activeLayerId);
+        rollbackToDraft();
     }
 
     const debounceChangeChipName = useDebouncedCallback(async (value) => {
@@ -139,11 +120,11 @@ const LayerOperations: React.FC = () => {
 
     return (
         <LayerOperationsWrap>
-            {!!activeLayer && activeLayer.version > 0 && (
+            {!!isViewMode && (
                 <RollbackBtn onClick={rollbackToDraft} />
             )}
             <LayerTitle>
-                {!!activeLayer && activeLayer?.version === 0 && (
+                {!!isEditableMode && (
                     <input
                         placeholder="Input the chip name"
                         type="text"
@@ -152,19 +133,18 @@ const LayerOperations: React.FC = () => {
                         onInput={onChangeNameHandler}
                     />
                 )}
-                {!!activeLayer && activeLayer.version > 0 && (
+                {!!isViewMode && (
                     <label>{activeLayer.name}-{activeLayer.version}</label>
                 )}
             </LayerTitle>
-            <AdjustScreenBtn onClick={adjustResolution} />
-            {!!activeLayer && activeLayer?.version > 0 && (
+            {!!isViewMode && (
                 <>
-                    <SaveBtn onClick={() => onRepublish(activeLayer.id)} />
-                    <RemoveBtn onClick={() => onRemove(activeLayer.id)} />
+                    <SaveBtn onClick={onRepublish} />
+                    <RemoveBtn onClick={onRemove} />
                 </>
             )}
-            {!!activeLayer && activeLayer?.version === 0 && (
-                <SaveBtn onClick={() => onPublish()} />
+            {!!isEditableMode && (
+                <SaveBtn onClick={onPublish} />
             )}
         </LayerOperationsWrap>
     )
