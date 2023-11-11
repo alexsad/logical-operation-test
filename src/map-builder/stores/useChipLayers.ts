@@ -1,18 +1,17 @@
-import create from 'zustand';
-
+import { create } from 'zustand';
 import { IChipLayer, IInputOutputPoint } from '../../interfaces/interfaces';
-import {LAYERS_STORE_KEY, openLayerStore} from '../../stores/idb-layers-store';
-import { nextUID } from '../../util/uuid';
+import { openLayerStore } from '../../stores/idb-layers-store';
+import { genUUID } from '../../util/uuid';
 
 type layerAsFunction = (...inputs: boolean[]) => boolean[];
 
-interface ILayersContext{
+interface ILayersContext {
     layers: IChipLayer[];
     activeLayerId: string;
-    layerFns:{[key:string]: Function};
-    setActiveLayerId:(layerId:string) => void;
+    layerFns: { [key: string]: Function };
+    setActiveLayerId: (layerId: string) => void;
     getActiveLayer: () => IChipLayer | undefined;
-    getLayerById: (layerId:string) => IChipLayer | undefined;
+    getLayerById: (layerId: string) => IChipLayer | undefined;
     getLayerAsFunction: (layerId: string) => undefined | layerAsFunction;
     addLayer: (layer: IChipLayer) => void;
     updateLayer: (layer: IChipLayer) => void;
@@ -20,20 +19,20 @@ interface ILayersContext{
     publishNewLayerVersion: (layer: IChipLayer) => Promise<IChipLayer>;
     getNewLayer: () => IChipLayer;
     removeLayer: (layerId: string) => void;
-    setLayers: (layers:IChipLayer[]) => void;
-    addLayers: (layers:IChipLayer[]) => void;
+    setLayers: (layers: IChipLayer[]) => void;
+    addLayers: (layers: IChipLayer[]) => void;
 }
 
 const basicLayerFns = {
     fn_not: (firstArg: boolean) => {
         // console.log('firs:', firstArg);
-        if(!!firstArg){
+        if (!!firstArg) {
             return [false];
         }
         return [true];
     },
     fn_and: (firstArg: boolean, secondArg: boolean) => {
-        if(!!firstArg && !!secondArg){
+        if (!!firstArg && !!secondArg) {
             return [true];
         }
         return [false];
@@ -44,43 +43,43 @@ const basicLayerFns = {
 }
 
 export default create<ILayersContext>((set, get) => ({
-    layerFns:{...basicLayerFns},
+    layerFns: { ...basicLayerFns },
     activeLayerId: '',
     layers: [],
     resolution: {
         width: 1024,
         height: 768,
     },
-    setLayers: (layers:IChipLayer[]) => {
-        const {publishLayer} = get();
+    setLayers: (layers: IChipLayer[]) => {
+        const { publishLayer } = get();
         set({
-            layerFns: {...basicLayerFns},
+            layerFns: { ...basicLayerFns },
             layers: [...layers],
         });
         layers.forEach((layer) => {
-            if(layer.version > 0){
+            if (layer.version > 0) {
                 layer.version -= 1;
                 publishLayer(layer);
             }
-        });      
+        });
     },
-    addLayers: (newLayers:IChipLayer[]) => {
-        const {publishLayer, layers} = get();
+    addLayers: (newLayers: IChipLayer[]) => {
+        const { publishLayer, layers } = get();
         const publishedLayers = newLayers.filter(layer => layer.version > 0);
         set({
-            layerFns: {...basicLayerFns},
+            layerFns: { ...basicLayerFns },
             layers: [...publishedLayers, ...layers],
         });
         [...publishedLayers, ...layers].forEach((layer) => {
-            if(layer.version > 0){
+            if (layer.version > 0) {
                 layer.version -= 1;
                 publishLayer(layer);
             }
         });
-    },   
+    },
     getNewLayer: () => {
-        const nextId = `${nextUID()}`;
-        return  {
+        const nextId = `${genUUID()}`;
+        return {
             id: nextId,
             name: '',
             version: 0,
@@ -96,14 +95,14 @@ export default create<ILayersContext>((set, get) => ({
         };
     },
     removeLayer: (layerId: string) => {
-        const {layers, activeLayerId, layerFns} = get();
+        const { layers, activeLayerId, layerFns } = get();
         const layerIndex = layers.findIndex((layer) => layer.id === layerId);
-        if(layerIndex > -1){
+        if (layerIndex > -1) {
             const layer = layers[layerIndex];
-            if(layer.version > 0){
+            if (layer.version > 0) {
                 layers.splice(layerIndex, 1);
                 delete layerFns[`fn_${layerId}`];
-                if(layer.id === activeLayerId){
+                if (layer.id === activeLayerId) {
                     set({
                         layerFns: {
                             ...layerFns,
@@ -111,7 +110,7 @@ export default create<ILayersContext>((set, get) => ({
                         activeLayerId: '',
                         layers: [...layers],
                     })
-                }else{
+                } else {
                     set({
                         layerFns: {
                             ...layerFns,
@@ -123,24 +122,24 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     publishNewLayerVersion: async (layerToPublish: IChipLayer) => {
-        const {publishLayer} = get();
+        const { publishLayer } = get();
         return publishLayer(layerToPublish);
     },
 
     publishLayer: async (layerToSave: IChipLayer) => {
-        const {layers, layerFns} = get();
+        const { layers, layerFns } = get();
         const generateFunctionFromLayer = (pLayer: IChipLayer) => {
             let fnBody = `
                 const _this = this;
             `;
-            const {wires, chips, outputs, inputs: inputPoints} = pLayer;
+            const { wires, chips, outputs, inputs: inputPoints } = pLayer;
             const outputsLength = outputs.length;
             const chipsLength = chips.length;
-            const getWire = (inputId: string) => wires.find(({chipInputId, chipOutputId}) => [chipInputId, chipOutputId].includes(inputId));
+            const getWire = (inputId: string) => wires.find(({ chipInputId, chipOutputId }) => [chipInputId, chipOutputId].includes(inputId));
             const getChipByOutputId = (outputId: string) => {
                 const chip = chips.find(chip => chip.outputs.find(chipOutput => chipOutput.id === outputId));
                 const chipOutputIndex = chip?.outputs.findIndex(chipOutput => chipOutput.id === outputId);
-                if(typeof chipOutputIndex === 'number' && chipOutputIndex > -1){
+                if (typeof chipOutputIndex === 'number' && chipOutputIndex > -1) {
                     return {
                         chip,
                         chipOutputIndex,
@@ -148,19 +147,19 @@ export default create<ILayersContext>((set, get) => ({
                 }
                 return null;
             }
-            const getArgments = (inputs: { id: string}[]) => {
+            const getArgments = (inputs: { id: string }[]) => {
                 let chipArgsStr: string[] = [];
-                for(let x = 0; x < inputs.length; x++){
+                for (let x = 0; x < inputs.length; x++) {
                     const wire = getWire(inputs[x].id);
-                    if(wire && wire.chipOutputId){
+                    if (wire && wire.chipOutputId) {
                         const inputLayerIndex = inputPoints.findIndex(inp => inp.id === wire.chipOutputId);
-                        if(inputLayerIndex > -1){
+                        if (inputLayerIndex > -1) {
                             chipArgsStr.push(`inputs[${inputLayerIndex}]`);
-                        }else{
+                        } else {
                             const shipOutput = getChipByOutputId(wire.chipOutputId);
                             chipArgsStr.push(`chip_inst_${shipOutput?.chip?.id}.getOutput(${shipOutput?.chipOutputIndex})`);
                         }
-                    }else{
+                    } else {
                         chipArgsStr.push('false');
                     }
                 }
@@ -169,11 +168,11 @@ export default create<ILayersContext>((set, get) => ({
             };
 
 
-            const inputPointIds = inputPoints.map(({id}) => id);
+            const inputPointIds = inputPoints.map(({ id }) => id);
             const concatInputIds = (chipInputs: IInputOutputPoint[]) => {
-                return chipInputs.map(({id}) => {
+                return chipInputs.map(({ id }) => {
                     const wire = getWire(id);
-                    if(!!wire && wire.chipInputId === id){
+                    if (!!wire && wire.chipInputId === id) {
                         return wire.chipOutputId;
                     }
                     return '';
@@ -184,11 +183,11 @@ export default create<ILayersContext>((set, get) => ({
                 const concatenedInputsIds = concatInputIds(chip.inputs);
                 const chipsFromOutputs = chips
                     .filter(chipOutPut => {
-                        const chipOutputIdsConcated =  chipOutPut.outputs.map(output_item => output_item.id);
+                        const chipOutputIdsConcated = chipOutPut.outputs.map(output_item => output_item.id);
                         return concatenedInputsIds.some(concatedId => chipOutputIdsConcated.includes(concatedId));
                     })
                     .map(chipOutput => chipOutput.id);
-                
+
                 chip.instInputDeps = [
                     ...chipsFromOutputs
                 ];
@@ -197,17 +196,17 @@ export default create<ILayersContext>((set, get) => ({
             chips.sort((chipA, chipB) => {
                 const inputIdsA = concatInputIds(chipA.inputs);
                 const onlyInputs = inputIdsA.every(inputId => inputPointIds.includes(inputId));
-                if(onlyInputs){
+                if (onlyInputs) {
                     return -1;
-                }else{
-                    if(chipB.instInputDeps.includes(chipA.id)){
+                } else {
+                    if (chipB.instInputDeps.includes(chipA.id)) {
                         return -1;
                     }
-                }              
+                }
                 return 1;
             });
 
-            for(let i = 0; i < chipsLength; i++){
+            for (let i = 0; i < chipsLength; i++) {
                 const chipInst = chips[i];
                 const chipInstVar = `chip_inst_${chipInst.id}`;
                 fnBody += `
@@ -233,23 +232,24 @@ export default create<ILayersContext>((set, get) => ({
                     }
                 `;
             }
-            for(let i = 0; i < chipsLength; i++){
+            for (let i = 0; i < chipsLength; i++) {
                 const chipInst = chips[i];
                 const chipInstVar = `chip_inst_${chipInst.id}`;
                 fnBody += `
                     ${chipInstVar}.setInputs(
-                        ${ getArgments(chipInst.inputs) }
+                        ${getArgments(chipInst.inputs)}
                     );
                 `;
             }
             fnBody += `
                 const outputs = [];
             `;
-            for(let x = 0; x < outputsLength; x++){
-                fnBody += `outputs.push(${ getArgments(outputs) });`;
+            for (let x = 0; x < outputsLength; x++) {
+                fnBody += `outputs.push(${getArgments(outputs)});`;
             }
 
             fnBody += `return outputs`;
+            // eslint-disable-next-line
             const chipFn = new Function('...inputs', fnBody || 'return null');
             return chipFn as (...inputs: boolean[]) => boolean[];
         };
@@ -267,22 +267,22 @@ export default create<ILayersContext>((set, get) => ({
             layers: [...layers],
             layerFns: {
                 ...layerFns,
-                [`fn_${layerToSave.id}`]:  generateFunctionFromLayer(layerToSave),
+                [`fn_${layerToSave.id}`]: generateFunctionFromLayer(layerToSave),
             }
         });
-        return {...layerToSave};
+        return { ...layerToSave };
     },
     saveLayers: async (layer: IChipLayer) => {
-        const {layers} = get();
+        const { layers } = get();
         layers.push(layer);
 
-        const {add} = await openLayerStore();
-        add(layer);   
+        const { add } = await openLayerStore();
+        add(layer);
     },
     addLayer: (layerToSave: IChipLayer) => {
-        const {layers} = get();
+        const { layers } = get();
         const layerIndex = layers.findIndex(layer => layer.id === layerToSave.id);
-        if(layerIndex > -1){
+        if (layerIndex > -1) {
             layers[layerIndex] = {
                 ...layerToSave
             }
@@ -293,13 +293,13 @@ export default create<ILayersContext>((set, get) => ({
         }
         set({
             layers: [...layers, layerToSave]
-        });      
+        });
     },
     updateLayer: (layer: IChipLayer) => {
-        const {layers} = get();
-        const layerIndex = layers.findIndex(({id}) => id === layer.id);
-        if(layerIndex){
-            layers[layerIndex] = { 
+        const { layers } = get();
+        const layerIndex = layers.findIndex(({ id }) => id === layer.id);
+        if (layerIndex) {
+            layers[layerIndex] = {
                 ...layer
             };
             set({
@@ -308,9 +308,9 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     getLayerAsFunction: (layerId: string) => {
-        const {layerFns} = get()
-        if(layerFns[`fn_${layerId}`]){
-            const encapsuled =  (...inputs: boolean[]) => {
+        const { layerFns } = get()
+        if (layerFns[`fn_${layerId}`]) {
+            const encapsuled = (...inputs: boolean[]) => {
                 const customFn = layerFns[`fn_${layerId}`];
                 return customFn.apply(layerFns, inputs);
             };
@@ -319,19 +319,19 @@ export default create<ILayersContext>((set, get) => ({
         return undefined;
     },
     getActiveLayer: () => {
-        const {layers, activeLayerId} = get();
+        const { layers, activeLayerId } = get();
         return layers.find(layer => layer.id === activeLayerId);
     },
-    getLayerById: (layerId:string) => {
-        const {layers} = get();
+    getLayerById: (layerId: string) => {
+        const { layers } = get();
         return layers.find(layer => layer.id === layerId);
     },
-    setActiveLayerId: (layerId:string) => {
-        const {layers} = get();
+    setActiveLayerId: (layerId: string) => {
+        const { layers } = get();
         set({
             layers: [...layers.map(layer => {
                 layer.visible = false;
-                if(layerId === layer.id){
+                if (layerId === layer.id) {
                     layer.visible = true;
                 }
                 return layer;

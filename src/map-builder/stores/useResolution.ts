@@ -1,7 +1,7 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { Resolution } from '../../interfaces/interfaces';
 
-interface IResolutionContext{
+interface IResolutionContext {
     resolution: Resolution;
     setResolution: (resolution: Resolution) => void;
 }

@@ -1,7 +1,6 @@
-import React, { lazy } from 'react';
-import styled from 'styled-components';
+import React from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import Sign from './sign/Sign';
+import styled from 'styled-components';
 import GlobalStyle from './GlobalStyle';
 import LoadingScreen from './pages/LoadingScreen';
 import colors from './ui/colors';
@@ -73,20 +72,20 @@ function App() {
   return (
     <AppWrap>
       <header className="App-header">
-          <GlobalStyle/>
-          <AppFrame> 
-              <React.Suspense fallback={<LoadingScreen/>}>
-                <Router>
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={<Navigate to={`/circ-builder`} />}
-                    />
-                    <Route path="/circ-builder" element={<Builder/>} />
-                  </Routes>
-                </Router>
-              </React.Suspense>
-              </AppFrame>
+        <GlobalStyle />
+        <AppFrame>
+          <React.Suspense fallback={<LoadingScreen />}>
+            <Router>
+              <Routes>
+                <Route
+                  path="/"
+                  element={<Navigate to={`/circ-builder`} />}
+                />
+                <Route path="/circ-builder" element={<Builder />} />
+              </Routes>
+            </Router>
+          </React.Suspense>
+        </AppFrame>
       </header>
     </AppWrap>
   );

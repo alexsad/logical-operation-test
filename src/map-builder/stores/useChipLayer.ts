@@ -1,8 +1,8 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { IChip, IChipLayer, IInputOutputPoint, Resolution } from '../../interfaces/interfaces';
-import { nextUID } from '../../util/uuid';
+import { genUUID } from '../../util/uuid';
 
-interface ILayersContext extends IChipLayer{
+interface ILayersContext extends IChipLayer {
     selectedOutputId: string | null;
     addChip: (chip: IChip) => void;
     moveChip: (chip: IChip) => void;
@@ -13,7 +13,7 @@ interface ILayersContext extends IChipLayer{
     activateInputSource: (inputId: string, active: boolean) => void;
     activateWire: (wireId: string, active: boolean) => void;
     changeLayerName: (newLayerName: string) => Promise<IChipLayer>;
-    getLayer:() => IChipLayer;
+    getLayer: () => IChipLayer;
     updateLayer: (layer: IChipLayer) => void;
     removeWire: (idWire: string) => void;
     removeChip: (idChip: string) => void;
@@ -24,7 +24,7 @@ interface ILayersContext extends IChipLayer{
     setResolution: (resolution: Resolution) => void;
 }
 
-const firstLayerId =  `${nextUID()}`;
+const firstLayerId = `${genUUID()}`;
 
 export default create<ILayersContext>((set, get) => ({
     selectedOutputId: null,
@@ -43,12 +43,12 @@ export default create<ILayersContext>((set, get) => ({
     getLayer: () => {
         const {
             id,
-            name, 
+            name,
             version,
-            visible, 
-            inputs, 
-            outputs, 
-            chips, 
+            visible,
+            inputs,
+            outputs,
+            chips,
             wires,
             resolution,
         } = get();
@@ -70,14 +70,14 @@ export default create<ILayersContext>((set, get) => ({
         })
     },
     removeOutput: (idOutput: string) => {
-        const {outputs, wires, removeWire} = get();
-        const index = outputs.findIndex(({id}) => id === idOutput);
-        if(index > -1){
+        const { outputs, wires, removeWire } = get();
+        const index = outputs.findIndex(({ id }) => id === idOutput);
+        if (index > -1) {
             wires
-                .filter(({chipInputId, chipOutputId}) => [chipInputId, chipOutputId].includes(idOutput))
+                .filter(({ chipInputId, chipOutputId }) => [chipInputId, chipOutputId].includes(idOutput))
                 .forEach(wire => {
                     removeWire(wire.id);
-                });            
+                });
             outputs.splice(index, 1);
             set({
                 outputs: [...outputs],
@@ -85,31 +85,31 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     removeInput: (idInput: string) => {
-        const {inputs, wires, removeWire} = get();
-        const index = inputs.findIndex(({id}) => id === idInput);
-        if(index > -1){
+        const { inputs, wires, removeWire } = get();
+        const index = inputs.findIndex(({ id }) => id === idInput);
+        if (index > -1) {
             wires
-                .filter(({chipInputId, chipOutputId}) => [chipInputId, chipOutputId].includes(idInput))
+                .filter(({ chipInputId, chipOutputId }) => [chipInputId, chipOutputId].includes(idInput))
                 .forEach(wire => {
                     removeWire(wire.id);
-                });            
-                inputs.splice(index, 1);
+                });
+            inputs.splice(index, 1);
             set({
                 inputs: [...inputs],
             })
         }
     },
     removeChip: (idChip: string) => {
-        const {chips, wires, removeWire} = get();
-        const index = chips.findIndex(({id}) => id === idChip);
-        if(index > -1){
-            const {inputs, outputs} = chips[index];
+        const { chips, wires, removeWire } = get();
+        const index = chips.findIndex(({ id }) => id === idChip);
+        if (index > -1) {
+            const { inputs, outputs } = chips[index];
             const points = [...inputs, ...outputs].map(point => point.id);
             wires
-                .filter(({chipInputId, chipOutputId}) => points.includes(chipInputId) || points.includes(chipOutputId))
+                .filter(({ chipInputId, chipOutputId }) => points.includes(chipInputId) || points.includes(chipOutputId))
                 .forEach(wire => {
                     removeWire(wire.id);
-                });            
+                });
             chips.splice(index, 1);
             set({
                 chips: [...chips],
@@ -117,22 +117,22 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     removeWire: (idWire: string) => {
-        const {wires} = get();
-        const wireIndex = wires.findIndex(({id}) => id === idWire);
-        if(wireIndex > -1){
+        const { wires } = get();
+        const wireIndex = wires.findIndex(({ id }) => id === idWire);
+        if (wireIndex > -1) {
             wires.splice(wireIndex, 1);
             set({
                 wires: [...wires],
             })
         }
     },
-    updateLayer:(layer:IChipLayer) => {
+    updateLayer: (layer: IChipLayer) => {
         set({
             ...layer,
         });
     },
     changeLayerName: async (newLayerName: string) => {
-        const {getLayer} = get();
+        const { getLayer } = get();
         set({
             name: newLayerName
         });
@@ -142,12 +142,12 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     activateInputSource: (inputId: string, active: boolean) => {
-        const {inputs, wires} = get();
-        const inputIndex = inputs.findIndex(({id}) => inputId === id);
-        if(inputIndex > -1){
+        const { inputs, wires } = get();
+        const inputIndex = inputs.findIndex(({ id }) => inputId === id);
+        if (inputIndex > -1) {
             inputs[inputIndex].active = active;
-            const selectedWires = wires.filter(({chipOutputId}) => inputId === chipOutputId);
-            if(!selectedWires.length){
+            const selectedWires = wires.filter(({ chipOutputId }) => inputId === chipOutputId);
+            if (!selectedWires.length) {
                 set({
                     inputs: [...inputs],
                 });
@@ -155,23 +155,23 @@ export default create<ILayersContext>((set, get) => ({
             }
             let hasChange = false;
             selectedWires.forEach(wire => {
-                if(wire.active !== active){
+                if (wire.active !== active) {
                     wire.active = active;
                     hasChange = true;
                 }
             });
-            if(hasChange){
+            if (hasChange) {
                 set({
                     wires: [...wires],
                     inputs: [...inputs],
                 });
             }
-        }      
+        }
     },
     activateWire: (wireId: string, active: boolean) => {
-        const {wires} = get();
-        const wire = wires.find(({id}) => id === wireId);
-        if(!!wire && wire.active !== active){
+        const { wires } = get();
+        const wire = wires.find(({ id }) => id === wireId);
+        if (!!wire && wire.active !== active) {
             wire.active = active;
             set({
                 wires: [...wires]
@@ -179,8 +179,8 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     addChip: (chip: IChip) => {
-        const {chips} = get();
-        const newChipId = `${nextUID()}`;
+        const { chips } = get();
+        const newChipId = `${genUUID()}`;
         chips.push({
             ...chip,
             id: newChipId,
@@ -198,18 +198,18 @@ export default create<ILayersContext>((set, get) => ({
         });
     },
     moveChip: (chip: IChip) => {
-        const {chips} = get();
-        const chipIndex = chips.findIndex(({id}) => chip.id === id);
-        if(chipIndex > -1){
-            chips[chipIndex].position = {...chip.position};
+        const { chips } = get();
+        const chipIndex = chips.findIndex(({ id }) => chip.id === id);
+        if (chipIndex > -1) {
+            chips[chipIndex].position = { ...chip.position };
             set({
                 chips: [...chips]
             });
         }
     },
     addInpuPoint: (point: IInputOutputPoint) => {
-        const {inputs} = get();
-        const newId = `in_point_${nextUID()}`;
+        const { inputs } = get();
+        const newId = `in_point_${genUUID()}`;
         inputs.push({
             ...point,
             id: newId,
@@ -219,8 +219,8 @@ export default create<ILayersContext>((set, get) => ({
         });
     },
     addOutPoint: (point: IInputOutputPoint) => {
-        const {outputs} = get(); 
-        const newId = `out_point_${nextUID()}`;
+        const { outputs } = get();
+        const newId = `out_point_${genUUID()}`;
         outputs.push({
             ...point,
             id: newId,
@@ -238,39 +238,39 @@ export default create<ILayersContext>((set, get) => ({
         // const {wires} = get();
         // const wire = wires.find(wire => [wire.chipInputId, wire.chipOutputId].includes(outputId));
         // if(!wire){
-            set({
-                selectedOutputId: outputId,
-            });
+        set({
+            selectedOutputId: outputId,
+        });
         // }
     },
     connectPoints: (inputId: string) => {
-        const {selectedOutputId, wires, chips, outputs, inputs} = get();
-        if(!!selectedOutputId){
+        const { selectedOutputId, wires, chips, outputs, inputs } = get();
+        if (!!selectedOutputId) {
             const wire = wires.find(wire => [wire.chipInputId, wire.chipOutputId].includes(inputId));
 
-            if(!!wire){
+            if (!!wire) {
                 // avoid duplicate connection
                 return;
             }
 
             const targets = [
-                    ...chips
-                        .filter(chip => [
-                            ...[...chip.outputs, ...chip.inputs].map(({id}) => id),
-                        ].some(id => [inputId, selectedOutputId].includes(id)))
-                        .map(({id}) => id),
-                    ...[...outputs, ...inputs].map(({id}) => id)
-                        .filter(id => [inputId, selectedOutputId].includes(id)),
+                ...chips
+                    .filter(chip => [
+                        ...[...chip.outputs, ...chip.inputs].map(({ id }) => id),
+                    ].some(id => [inputId, selectedOutputId].includes(id)))
+                    .map(({ id }) => id),
+                ...[...outputs, ...inputs].map(({ id }) => id)
+                    .filter(id => [inputId, selectedOutputId].includes(id)),
             ];
 
-            if(targets.length < 2){
+            if (targets.length < 2) {
                 // avoid connection to same chip
                 return;
             }
 
             wires.push({
                 ...{
-                    id: `${nextUID()}`,
+                    id: `${genUUID()}`,
                     chipInputId: inputId,
                     chipOutputId: selectedOutputId,
                     active: false,
@@ -283,9 +283,9 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     changeInputLabel: (pointId: string, label: string) => {
-        const {inputs} = get();
+        const { inputs } = get();
         const pointIndex = inputs.findIndex(input => input.id === pointId);
-        if(pointIndex > -1){
+        if (pointIndex > -1) {
             inputs[pointIndex].label = label;
             set({
                 inputs: [...inputs],
@@ -293,9 +293,9 @@ export default create<ILayersContext>((set, get) => ({
         }
     },
     changeOutputLabel: (pointId: string, label: string) => {
-        const {outputs} = get();
+        const { outputs } = get();
         const pointIndex = outputs.findIndex(outpoint => outpoint.id === pointId);
-        if(pointIndex > -1){
+        if (pointIndex > -1) {
             outputs[pointIndex].label = label;
             set({
                 outputs: [...outputs],

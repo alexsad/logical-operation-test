@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import ProgressBar from '../ui/ProgressBar';
 import { ReactProps } from '../interfaces/interfaces';
+import ProgressBar from '../ui/ProgressBar';
 
 const LoadingScreenWrap = styled.div`
     width: 100vw;
@@ -29,10 +29,10 @@ const ProgressLoading: React.FC = () => {
 
     useEffect(() => {
         let idTimeout: NodeJS.Timeout;
-        if(progress < 1){
-            idTimeout = setTimeout(() => { 
+        if (progress < 1) {
+            idTimeout = setTimeout(() => {
                 setProgress(currprogress => {
-                    if(currprogress < 1){
+                    if (currprogress < 1) {
                         return currprogress + 0.5;
                     }
                     return 1;
@@ -40,7 +40,7 @@ const ProgressLoading: React.FC = () => {
             }, 1000);
         }
         return () => {
-            if(idTimeout){
+            if (idTimeout) {
                 clearTimeout(idTimeout);
             }
         }
@@ -49,15 +49,15 @@ const ProgressLoading: React.FC = () => {
     return (
         <ProgressLoadingWrap>
             LOADING....
-            <ProgressBar color="green" value={progress}/>
+            <ProgressBar $color="green" $value={progress} />
         </ProgressLoadingWrap>
     );
 }
 
-const LoadingScreen: React.FC<ReactProps> = ({children}) => {
+const LoadingScreen: React.FC<ReactProps> = ({ children }) => {
     return (
         <LoadingScreenWrap>
-            <ProgressLoading/>
+            <ProgressLoading />
             {children}
         </LoadingScreenWrap>
     );

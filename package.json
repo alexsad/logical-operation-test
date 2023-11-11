@@ -4,16 +4,15 @@
   "private": true,
   "homepage": "https://logical-operators-test.netlify.app",
   "dependencies": {
-    "idb": "7.1.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.18.0",
     "react-scripts": "5.0.1",
     "react-tracked": "1.7.11",
     "styled-components": "6.1.1",
-    "uuid": "9.0.1",
     "web-vitals": "3.5.0",
-    "zustand": "4.4.6"
+    "zustand": "4.4.6",
+    "use-debounce": "10.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -49,7 +48,6 @@
     "@types/react-dom": "18.2.15",
     "@types/react-router-dom": "5.3.3",
     "@types/styled-components": "5.1.30",
-    "@types/uuid": "9.0.7",
     "typescript": "5.2.2",
     "typescript-plugin-styled-components": "3.0.0"
   }
