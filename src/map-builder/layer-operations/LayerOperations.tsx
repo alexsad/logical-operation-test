@@ -31,7 +31,7 @@ const LayerTitle = styled.div`
         font-size: 2rem;
     }
     > input[type=text] {
-        width: 100%;
+        width: calc(100% - 15px);
         &::placeholder {
             color: ${colors['blue.200']};
             opacity: 1;
@@ -120,12 +120,17 @@ const LayerOperations: React.FC = () => {
 
     const adjustResolution = () => {
         const {resolution} = useResolution.getState();
-        const {updateLayer, getLayer} = useChipLayer.getState();
-        const {updateLayer: updateLayerInLayers} = useChipLayers.getState();
+        const {getLayer, setResolution} = useChipLayer.getState();
+        const {updateLayer} = useChipLayers.getState();
         const layer = getLayer();
         layer.resolution = {...resolution};
+        setResolution({...resolution});
         updateLayer(layer);
-        updateLayerInLayers(layer);
+        setTimeout(() => {
+            globalThis.dispatchEvent(
+                new CustomEvent('chip:move', {})
+            );
+        }, 1000);
     }
 
     return (

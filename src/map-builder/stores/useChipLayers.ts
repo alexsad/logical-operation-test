@@ -258,6 +258,8 @@ export default create<ILayersContext>((set, get) => ({
 
         const layerIndex = layers.findIndex((layer) => layer.id === layerToSave.id);
         layerToSave.version += 1;
+        layerToSave.inputs.forEach(input => input.active = false);
+        layerToSave.outputs.forEach(output => output.active = false);
         layers[layerIndex] = {
             ...layerToSave,
         };

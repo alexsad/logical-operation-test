@@ -88,14 +88,21 @@ const ProjectProperties: React.FC =  () => {
     }
 
     useEffect(() => {
+        // const {resolution} = useResolution.getState();
         if(resolution.height > 0){
-            const {updateLayer} = useChipLayer.getState();
-            const {addLayer, setActiveLayerId, getNewLayer} = useChipLayers.getState();
-            const newLayer =  getNewLayer();
-            newLayer.resolution = {...resolution};
-            updateLayer({...newLayer});
-            addLayer({...newLayer});
-            setActiveLayerId(newLayer.id);
+            const {setResolution, getLayer} = useChipLayer.getState();
+            const {addLayer, setActiveLayerId, activeLayerId} = useChipLayers.getState();
+            const layer = getLayer();
+            if(layer.version < 1){
+                setResolution({...resolution});
+                if(layer.id !== activeLayerId){
+                    addLayer({...layer});
+                    setActiveLayerId(layer.id);
+                }
+                globalThis.dispatchEvent(
+                    new CustomEvent('chip:move', {})
+                );
+            }
         }
     },[resolution]);
 
